@@ -124,7 +124,7 @@ export const SOURCES: SourceRow[] = [
   },
   {
     "item": "예금금리",
-    "value": "정기예금 3.14% (2026.8)",
+    "value": "정기예금 평균 3.14% (2026.8) → 계산은 보수적으로 연 3.0% 적용",
     "status": "교차확인",
     "url": "https://eiec.kdi.re.kr/policy/materialView.do?num=287550"
   },

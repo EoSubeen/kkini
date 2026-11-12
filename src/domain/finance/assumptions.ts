@@ -7,7 +7,8 @@ export const ASSUMPTIONS = {
   horizonAge: 95,
   inflationRate: 0.02,
   nationalPensionIndexRate: 0.021,
-  safeReturnRate: 0.0314,
+  // 예금 수익률: 2026.8 정기예금 평균 3.14%(재무 가정표 No.43)를 보수적으로 낮춘 팀 가정. r6 엔진 BASE.safe_r와 같은 값.
+  safeReturnRate: 0.03,
   riskyReturnRate: 0.06,
   riskyAssetWeight: 0.1,
   retirementReturnRate: 0.04,
@@ -29,7 +30,7 @@ export const ASSUMPTIONS = {
 export const CALCULATION_BASIS = [
   { key: "money-unit", label: "금액 단위", value: "만원(KRW 10,000)" },
   { key: "inflation", label: "물가상승률", value: "연 2.0%" },
-  { key: "safe-return", label: "예금 수익률", value: "연 3.0%(이자소득세 15.4% 차감)" },
+  { key: "safe-return", label: "예금 수익률", value: "연 3.0%(정기예금 평균 3.14%를 보수적으로 낮춤, 이자소득세 15.4% 차감)" },
   { key: "risk-return", label: "위험자산 수익률", value: "연 6.0%" },
   { key: "pension-return", label: "연금계좌 수익률", value: "위험자산 비중에 연동(김샌드 약 3.7%)" },
   { key: "refund", label: "연말정산 환급", value: "정기 월수지·장기 계산에서 제외" },
