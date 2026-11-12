@@ -2,14 +2,9 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { CalculationBasisDialog } from "@/components/calculation-basis-dialog";
 import { Card, diagnosisTabs, Metric, PageIntro, SectionHeading, SegmentTabs } from "@/components/ui";
-import { diagnosisResultSchema } from "@/lib/contracts";
-import { createClient } from "@/lib/supabase/server";
-
-const peers = [
-  { label: "금융자산", ours: "4,500만", average: "6,200만", oursWidth: 64, averageLeft: 80 },
-  { label: "주택자산", ours: "6.0억", average: "4.8억", oursWidth: 88, averageLeft: 68 },
-  { label: "주택대출", ours: "1.8억", average: "1.2억", oursWidth: 72, averageLeft: 48 },
-];
+import { calculateFinance, peerComparison } from "@/domain/finance";
+import { shortMoney } from "@/lib/format/money";
+import { getLatestState } from "@/server";
 
 export const instant = false;
 
@@ -20,16 +15,10 @@ function signedAmount(value: number) {
 
 export default async function CurrentDiagnosisPage() {
   await connection();
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("calculation_snapshots")
-    .select("result, created_at")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  const parsed = diagnosisResultSchema.safeParse(data?.result);
+  // 현재 진단은 레시피를 적용하기 전 '지금 그대로'를 보여야 하므로 최신 입력으로 다시 계산한다.
+  const { profile } = await getLatestState();
 
-  if (!parsed.success) {
+  if (!profile) {
     return (
       <div className="page-stack">
         <SegmentTabs items={diagnosisTabs} current="/diagnosis/current" />
@@ -42,7 +31,18 @@ export default async function CurrentDiagnosisPage() {
     );
   }
 
-  const result = parsed.data;
+  const result = calculateFinance(profile);
+  const peer = peerComparison(profile);
+  const peers = peer.rows.map((row) => {
+    const scale = Math.max(row.ours, row.average, 1) * 1.1;
+    return {
+      label: row.label,
+      ours: shortMoney(row.ours),
+      average: shortMoney(row.average),
+      oursWidth: Math.max(2, Math.round((row.ours / scale) * 100)),
+      averageLeft: Math.round((row.average / scale) * 100),
+    };
+  });
   const cashFlow = result.monthlyCashFlow;
   const isDeficit = cashFlow < 0;
   const emergencyMonths = result.health.emergencyFundMonths;
@@ -53,7 +53,7 @@ export default async function CurrentDiagnosisPage() {
   return (
     <div className="page-stack">
       <SegmentTabs items={diagnosisTabs} current="/diagnosis/current" />
-      <PageIntro eyebrow="현재 진단" title={isDeficit ? "지금 내 샌드위치는 조금 눌려 있어요" : "지금 내 샌드위치는 안정적으로 쌓였어요"} description={`저장된 입력으로 계산한 최근 결과예요. 95세 금융·연금 자산은 약 ${(result.assetsAt95 / 10000).toFixed(1)}억 원으로 예상돼요.`} />
+      <PageIntro eyebrow="현재 진단" title={isDeficit ? "지금 내 샌드위치는 조금 눌려 있어요" : "지금 내 샌드위치는 안정적으로 쌓였어요"} description={`저장된 입력으로 계산한 지금 그대로의 결과예요. ${result.depletionAge === null ? "95세까지 금융자산이 유지되고" : `금융자산은 ${result.depletionAge}세에 바닥나고`}, 95세 금융·연금 자산은 약 ${(result.assetsAt95 / 10000).toFixed(1)}억 원으로 예상돼요.`} />
 
       <Card tone="green" className="section-stack">
         <SectionHeading title="이번 달 돈의 흐름" action={<strong style={{ color: isDeficit ? "var(--kkini-red)" : "var(--kkini-green-700)" }}>{signedAmount(cashFlow)}</strong>} />
@@ -72,7 +72,7 @@ export default async function CurrentDiagnosisPage() {
       </section>
 
       <section className="section-stack">
-        <SectionHeading title="동년배와 비교" description="50대 수도권 자가 가구의 설명용 예시 기준" action={<span className="report-card__tag">예시 데이터</span>} />
+        <SectionHeading title="동년배와 비교" description={peer.applicable ? peer.source : `${peer.source} (내 나이와 연령대가 달라 참고용이에요)`} action={<span className="report-card__tag">{peer.applicable ? "공식 통계" : "참고 비교"}</span>} />
         <Card className="chart-panel">
           {peers.map((peer) => (
             <div className="bar-row" key={peer.label}>
@@ -83,7 +83,7 @@ export default async function CurrentDiagnosisPage() {
               </div>
             </div>
           ))}
-          <p className="notice">초록 막대는 우리 집, 주황 표시는 동년배 평균이에요. 비교값은 화면 설명용 예시이며 실제 서비스에서는 공신력 있는 통계 기준을 연결해요.</p>
+          <p className="notice">초록 막대는 우리 집, 주황 표시는 50대 가구 평균이에요. 총자산에는 집·예금·투자·연금·기타 자산이 들어가요.</p>
         </Card>
       </section>
     </div>

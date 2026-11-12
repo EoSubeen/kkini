@@ -4,3 +4,8 @@ export * from "./fixtures";
 export * from "./math";
 export * from "./normalize";
 export * from "./types";
+export * from "./analysis";
+export * from "./plan";
+export { RECIPES, EVENTS } from "./r6";
+export * from "./alternatives";
+export * from "./sources";

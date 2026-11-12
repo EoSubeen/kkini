@@ -8,11 +8,26 @@ vi.mock("next/navigation", () => ({
 
 afterEach(cleanup);
 
+const savedSelection = {
+  selectedRecipeIds: ["basic", "reemp", "hp"] as ("basic" | "reemp" | "hp")[],
+  housing: { downsizingRatio: 0.7, downsizingAge: null, reverseMortgageEnabled: false },
+};
+
 describe("RecipeBuilder", () => {
+  it("restores saved ingredient choices from the saved recipe ids", () => {
+    render(<RecipeBuilder initialSelection={savedSelection} />);
+    fireEvent.click(screen.getByRole("tab", { name: "소스" }));
+    expect(screen.getByRole("button", { name: /마요네즈/ })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("tab", { name: "치즈" }));
+    expect(screen.getByRole("button", { name: /고다/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /브리/ })).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("opens the fixed report example without changing ingredient choices", () => {
-    render(<RecipeBuilder />);
+    render(<RecipeBuilder reportCase={{ monthlyCashFlow: -12.04, depletionAge: null, assetsAt95: 32_200 }} />);
 
     const rye = screen.getByRole("button", { name: /호밀빵/ });
+    fireEvent.click(rye);
     expect(rye).toHaveAttribute("aria-pressed", "true");
 
     fireEvent.click(screen.getByRole("button", { name: /보고서 추천안 불러오기/ }));
@@ -24,7 +39,7 @@ describe("RecipeBuilder", () => {
   });
 
   it("clears the current-home reverse mortgage when downsizing is selected", () => {
-    render(<RecipeBuilder />);
+    render(<RecipeBuilder initialSelection={savedSelection} />);
 
     const reverseMortgage = screen.getByRole("checkbox", { name: /본인 주택연금/ });
     const downsizing = screen.getByRole("checkbox", { name: /집 줄여 이사/ });

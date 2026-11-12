@@ -27,6 +27,14 @@ export interface FinanceTimelineRow {
   totalFinancialAssets: number;
   universityChildren: number;
   highSchoolChildren: number;
+  wage: number;
+  nationalPension: number;
+  housingPension: number;
+  livingExpense: number;
+  educationExpense: number;
+  parentSupport: number;
+  mortgagePayment: number;
+  insurancePremium: number;
 }
 
 export interface FinanceCalculation extends DiagnosisResult {
@@ -36,4 +44,8 @@ export interface FinanceCalculation extends DiagnosisResult {
   timeline: FinanceTimelineRow[];
   basis: ReadonlyArray<{ key: string; label: string; value: string }>;
   notices: string[];
+  /** 정년~국민연금 개시 사이 순현금흐름 부족액(양수, 만 원) */
+  crevasseShortfall: number;
+  savingsRate: number;
+  debtServiceRate: number;
 }

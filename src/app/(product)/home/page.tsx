@@ -3,22 +3,18 @@ import Link from "next/link";
 import { ArrowRight, CircleAlert } from "lucide-react";
 import { connection } from "next/server";
 import { Card, PageIntro, ProgressBar, SectionHeading } from "@/components/ui";
-import { diagnosisResultSchema } from "@/lib/contracts";
+import { calculateFinance } from "@/domain/finance";
 import { createClient } from "@/lib/supabase/server";
+import { getLatestState } from "@/server";
 
 export const instant = false;
 
 export default async function HomePage() {
   await connection();
   const supabase = await createClient();
-  const [userResponse, calculationResponse, planResponse] = await Promise.all([
+  const [userResponse, latest, planResponse] = await Promise.all([
     supabase.auth.getUser(),
-    supabase
-      .from("calculation_snapshots")
-      .select("result")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+    getLatestState(),
     supabase
       .from("check_plans")
       .select("id")
@@ -27,7 +23,6 @@ export default async function HomePage() {
       .limit(1)
       .maybeSingle(),
   ]);
-  const parsed = diagnosisResultSchema.safeParse(calculationResponse.data?.result);
   const displayName =
     typeof userResponse.data.user?.user_metadata?.display_name === "string"
       ? userResponse.data.user.user_metadata.display_name
@@ -44,7 +39,7 @@ export default async function HomePage() {
   }
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-  if (!parsed.success) {
+  if (!latest.profile) {
     return (
       <div className="page-stack">
         <PageIntro eyebrow={`안녕하세요, ${displayName} 님`} title="첫 재무 진단을 시작해 볼까요?" description="우리 집 숫자를 입력하면 월수지와 맞춤 레시피를 만들어 드려요." />
@@ -56,7 +51,9 @@ export default async function HomePage() {
     );
   }
 
-  const result = parsed.data;
+  // 저장된 최신 입력으로 다시 계산한다. 이번 달 월수지는 '지금 그대로', 95세 자산은 고른 레시피가 있으면 그 조합 기준이다.
+  const result = calculateFinance(latest.profile);
+  const planned = latest.selection ? calculateFinance(latest.profile, latest.selection) : null;
   const roundedCashFlow = Math.round(result.monthlyCashFlow);
   const cashFlowLabel = `${roundedCashFlow > 0 ? "+" : roundedCashFlow < 0 ? "−" : ""}${Math.abs(roundedCashFlow).toLocaleString("ko-KR")}만 원`;
   const deficit = roundedCashFlow < 0;
@@ -79,7 +76,7 @@ export default async function HomePage() {
           <CircleAlert color="#b77626" size={22} aria-hidden="true" />
           <div>
             <strong>{deficit ? "이번 달은 생활비 조정부터" : "남는 돈의 목적을 정해 볼까요?"}</strong>
-            <p style={{ margin: "4px 0 0", color: "var(--kkini-muted)", fontSize: 14 }}>95세 금융·연금 자산은 현재 가정으로 약 {(result.assetsAt95 / 10000).toFixed(1)}억 원이에요.</p>
+            <p style={{ margin: "4px 0 0", color: "var(--kkini-muted)", fontSize: 14 }}>{planned ? `고른 레시피를 적용하면 이번 달 ${Math.round(planned.monthlyCashFlow).toLocaleString("ko-KR")}만 원, 95세 금융·연금 자산은 약 ${(planned.assetsAt95 / 10000).toFixed(1)}억 원이에요.` : `지금 그대로면 ${result.depletionAge === null ? "95세까지 금융자산이 버티고" : `${result.depletionAge}세에 금융자산이 바닥나고`}, 95세 금융·연금 자산은 약 ${(result.assetsAt95 / 10000).toFixed(1)}억 원이에요.`}</p>
           </div>
         </div>
         <Link className="button-secondary" href="/recipe">추천 레시피 보기 <ArrowRight size={18} aria-hidden="true" /></Link>

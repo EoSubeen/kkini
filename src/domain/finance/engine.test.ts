@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { REPORT_RECOMMENDATION_CASE } from "./assumptions";
+import { reportCaseResult, monteCarlo } from "./analysis";
 import { calculateFinance } from "./engine";
 import { kimSandProfile } from "./fixtures";
 import { loanBalance, payment } from "./math";
@@ -55,12 +56,36 @@ describe("calculateFinance", () => {
     expect(first.timeline.at(-1)?.age).toBe(95);
   });
 
-  it("keeps the original demo's Kim Sand current cash-flow regression", () => {
+  it("reproduces the submitted report's current-state figures for Kim Sand", () => {
     const result = calculateFinance(kimSandProfile, undefined, { now: fixedNow });
-    // Original HTML run(eng()) = -47.250895...; the extracted domain engine keeps
-    // the user-facing value within one 만원 while moving timestamps outside formulas.
-    expect(result.monthlyCashFlow).toBeCloseTo(-47.25, 0);
+    // 보고서 [표 4]·[표 14]: 정기 월수지 −61만 원(연말정산 환급 제외), 59세 고갈, 95세 −27.1억 원
+    expect(result.monthlyCashFlow).toBeCloseTo(-60.84, 1);
+    expect(result.depletionAge).toBe(59);
+    expect(result.assetsAt95 / 10_000).toBeCloseTo(-27.09, 1);
     expect(result.moneyUnit).toBe("KRW_10K");
+  });
+
+  it("uses the younger spouse's age for the housing pension (63세, 월 141만 원)", () => {
+    const result = calculateFinance(
+      kimSandProfile,
+      { selectedRecipeIds: ["hp"], housing: { downsizingRatio: 0.7, downsizingAge: null, reverseMortgageEnabled: false } },
+      { now: fixedNow },
+    );
+    expect(result.appliedRecipeIds).toContain("hp");
+    expect(result.timeline.find((row) => row.age === 65)?.housingPension).toBeCloseTo(141 * 12, 0);
+  });
+
+  it("matches the report recommendation case and Monte Carlo success rate", () => {
+    const report = reportCaseResult();
+    expect(report.monthlyCashFlow).toBeCloseTo(-12, 0);
+    expect(report.depletionAge).toBeNull();
+    expect(report.assetsAt95 / 10_000).toBeCloseTo(3.2, 1);
+    const mc = monteCarlo(kimSandProfile, {
+      selectedRecipeIds: ["basic", "ins", "par", "term", "reemp", "hp", "retm", "npcont"],
+      housing: { downsizingRatio: 0.7, downsizingAge: null, reverseMortgageEnabled: false },
+    });
+    expect(mc.selected.p).toBeCloseTo(0.992, 3);
+    expect(mc.guardrail.p).toBe(1);
   });
 
   it("exposes the fixed submitted-report case separately from user calculations", () => {
