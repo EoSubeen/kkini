@@ -1,0 +1,7 @@
+{
+  "kind": "portable-skill",
+  "managed_by": "meta-harness",
+  "mode": "copy",
+  "payload_sha256": "b49d9aeb8340cd4ddf44dd2c3fce3a5cf1fec0881fac2f62f5f76c0978af0c5d",
+  "schema_version": 1
+}

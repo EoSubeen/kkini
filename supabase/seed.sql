@@ -1,0 +1,2 @@
+-- Keep local seed data free of real personal or financial information.
+-- Automated tests create disposable users inside transactions instead.

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" fill="none">
+  <rect width="1600" height="1200" rx="48" fill="#FFF8E8"/>
+  <text x="104" y="128" fill="#2B2A27" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="48" font-weight="750">이번 달, 수입보다 지출이 47만 원 더 커요</text>
+  <text x="104" y="184" fill="#6E675D" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="26">김샌드 님의 월 지출을 샌드위치 층처럼 쌓아 보았습니다.</text>
+
+  <!-- income ruler -->
+  <text x="105" y="284" fill="#2B2A27" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="25" font-weight="700">월수입 600만 원</text>
+  <rect x="106" y="322" width="162" height="610" rx="28" fill="#E6EFE9" stroke="#4F7B63" stroke-width="6"/>
+  <rect x="106" y="322" width="162" height="610" rx="28" fill="#4F7B63"/>
+  <path d="M78 322H295" stroke="#2F5743" stroke-width="8" stroke-linecap="round"/>
+  <text x="187" y="642" fill="white" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="800" text-anchor="middle" transform="rotate(-90 187 642)">들어오는 돈</text>
+
+  <!-- sandwich, 647 total against income 600 -->
+  <g>
+    <path d="M450 889H1030C1066 889 1095 918 1095 954V985H385V954C385 918 414 889 450 889Z" fill="#F0B953" stroke="#C9862F" stroke-width="8"/>
+    <rect x="397" y="837" width="686" height="62" rx="20" fill="#6DA9C7" stroke="#2C6E90" stroke-width="8"/>
+    <rect x="397" y="767" width="686" height="74" rx="20" fill="#F5D64E" stroke="#B59113" stroke-width="8"/>
+    <path d="M397 670L511 646L625 677L738 646L851 677L966 646L1083 675V775H397V670Z" fill="#5B678A" stroke="#37415F" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M397 446C505 412 579 419 681 448C779 475 869 474 966 440C1013 424 1051 428 1083 440V673H397V446Z" fill="#4F7B63" stroke="#2F5743" stroke-width="8"/>
+    <path d="M397 388C493 353 572 359 681 389C787 418 877 416 978 380C1021 365 1055 368 1083 378V449H397V388Z" fill="#D95D50" stroke="#A43B34" stroke-width="8"/>
+    <path d="M397 318C397 272 435 235 481 235H999C1045 235 1083 272 1083 318V389H397V318Z" fill="#F7D883" stroke="#C9862F" stroke-width="8"/>
+  </g>
+
+  <!-- income threshold and deficit -->
+  <path d="M286 322H1134" stroke="#2F5743" stroke-width="5" stroke-dasharray="14 14"/>
+  <rect x="1129" y="236" width="132" height="86" rx="20" fill="#D95D50"/>
+  <text x="1195" y="272" fill="white" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="20" font-weight="700" text-anchor="middle">초과 지출</text>
+  <text x="1195" y="304" fill="white" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="27" font-weight="850" text-anchor="middle">47만 원</text>
+  <path d="M1129 279H1084" stroke="#D95D50" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- labels -->
+  <g font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="22" fill="#2B2A27">
+    <path d="M1094 355H1250" stroke="#9B8B73" stroke-width="3"/>
+    <text x="1270" y="363"><tspan font-weight="750">부모님 지원</tspan><tspan dx="16" fill="#6E675D">50</tspan></text>
+    <path d="M1094 540H1250" stroke="#9B8B73" stroke-width="3"/>
+    <text x="1270" y="548"><tspan font-weight="750">생활비</tspan><tspan dx="16" fill="#6E675D">258</tspan></text>
+    <path d="M1094 710H1250" stroke="#9B8B73" stroke-width="3"/>
+    <text x="1270" y="718"><tspan font-weight="750">대출 상환</tspan><tspan dx="16" fill="#6E675D">119</tspan></text>
+    <path d="M1094 805H1250" stroke="#9B8B73" stroke-width="3"/>
+    <text x="1270" y="813"><tspan font-weight="750">보험료</tspan><tspan dx="16" fill="#6E675D">45</tspan></text>
+    <path d="M1094 868H1250" stroke="#9B8B73" stroke-width="3"/>
+    <text x="1270" y="876"><tspan font-weight="750">연금 납입</tspan><tspan dx="16" fill="#6E675D">25</tspan></text>
+    <path d="M1094 942H1250" stroke="#9B8B73" stroke-width="3"/>
+    <text x="1270" y="950"><tspan font-weight="750">교육비</tspan><tspan dx="16" fill="#6E675D">150</tspan></text>
+  </g>
+  <rect x="105" y="1042" width="1390" height="82" rx="24" fill="#F1E7D2"/>
+  <text x="143" y="1094" fill="#2B2A27" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="26"><tspan font-weight="750">먼저 줄일 층</tspan><tspan dx="20">생활비 · 보험료 · 부모님 지원을 조정하면 적자를 빠르게 줄일 수 있어요.</tspan></text>
+</svg>

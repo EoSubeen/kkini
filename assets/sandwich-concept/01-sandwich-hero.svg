@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" fill="none">
+  <defs>
+    <filter id="shadow" x="180" y="140" width="1240" height="900" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="30" stdDeviation="28" flood-color="#6B4B20" flood-opacity=".18"/>
+    </filter>
+    <linearGradient id="bread" x1="460" y1="235" x2="1110" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE7A3"/><stop offset="1" stop-color="#F0B953"/>
+    </linearGradient>
+    <linearGradient id="breadSide" x1="420" y1="680" x2="1180" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7D883"/><stop offset="1" stop-color="#DEA044"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#shadow)">
+    <!-- bottom bread -->
+    <path d="M363 760C363 701 411 659 470 659H1130C1189 659 1237 701 1237 760V801C1237 860 1189 908 1130 908H470C411 908 363 860 363 801V760Z" fill="url(#breadSide)" stroke="#C9862F" stroke-width="18"/>
+    <path d="M417 780C458 745 514 731 574 731H1028C1087 731 1143 745 1183 780" stroke="#FFF2BD" stroke-width="18" stroke-linecap="round" opacity=".65"/>
+
+    <!-- pension layer -->
+    <path d="M330 716C445 667 552 675 671 716C792 758 909 746 1028 701C1111 670 1183 681 1274 724L1231 774C1153 739 1100 733 1026 760C897 807 769 819 642 775C537 739 451 733 354 774L330 716Z" fill="#6DA9C7" stroke="#2C6E90" stroke-width="15" stroke-linejoin="round"/>
+
+    <!-- insurance layer -->
+    <path d="M336 654L494 604L650 660L803 606L958 660L1112 610L1264 658L1224 723L1111 691L959 740L802 684L652 740L493 683L373 721L336 654Z" fill="#F5D64E" stroke="#B59113" stroke-width="15" stroke-linejoin="round"/>
+
+    <!-- loan layer -->
+    <path d="M359 573C433 544 508 541 583 570L684 608L794 567C873 537 949 539 1024 569L1135 613L1237 575L1264 652L1130 700L1011 652C951 628 893 627 834 650L682 707L557 660C498 638 446 637 386 660L359 573Z" fill="#5B678A" stroke="#37415F" stroke-width="15"/>
+    <circle cx="510" cy="609" r="12" fill="#9EABD1"/><circle cx="921" cy="603" r="12" fill="#9EABD1"/><circle cx="1112" cy="647" r="10" fill="#9EABD1"/>
+
+    <!-- living costs layer -->
+    <path d="M336 500C454 452 555 458 680 498C804 538 919 534 1043 486C1123 456 1198 469 1277 507L1237 590C1163 556 1111 551 1040 577C902 627 768 633 633 590C526 556 451 553 367 587L336 500Z" fill="#4F7B63" stroke="#2F5743" stroke-width="15"/>
+    <path d="M471 531L506 513M729 550L768 531M1049 526L1091 507" stroke="#B7D5C2" stroke-width="13" stroke-linecap="round"/>
+
+    <!-- education / tomato layer -->
+    <path d="M350 449C413 414 481 403 550 419C625 437 691 479 770 480C849 481 913 437 988 419C1062 401 1131 414 1251 462L1221 527C1125 490 1066 479 1007 493C923 513 854 558 769 556C682 555 613 510 531 491C476 478 430 486 377 514L350 449Z" fill="#D95D50" stroke="#A43B34" stroke-width="15"/>
+    <circle cx="475" cy="459" r="14" fill="#F7A098"/><circle cx="1042" cy="456" r="14" fill="#F7A098"/>
+
+    <!-- top bread -->
+    <path d="M359 420C379 277 493 188 650 169C742 158 872 160 959 173C1118 198 1221 289 1241 420C1247 459 1216 491 1176 491H425C385 491 354 459 359 420Z" fill="url(#bread)" stroke="#C9862F" stroke-width="18"/>
+    <path d="M470 385C491 292 579 250 689 237C773 227 873 230 948 245C1040 263 1112 310 1128 385" stroke="#FFF2BD" stroke-width="22" stroke-linecap="round" opacity=".72"/>
+    <ellipse cx="603" cy="323" rx="12" ry="23" transform="rotate(-43 603 323)" fill="#D89A3B"/>
+    <ellipse cx="731" cy="270" rx="11" ry="22" transform="rotate(-18 731 270)" fill="#D89A3B"/>
+    <ellipse cx="902" cy="286" rx="11" ry="22" transform="rotate(24 902 286)" fill="#D89A3B"/>
+    <ellipse cx="1031" cy="342" rx="12" ry="23" transform="rotate(45 1031 342)" fill="#D89A3B"/>
+  </g>
+  <!-- small visual cue: the sandwich is a financial stack -->
+  <g stroke="#2B2A27" stroke-width="14" stroke-linecap="round">
+    <path d="M264 612H156"/><path d="M134 562V662"/>
+    <path d="M1336 612H1444"/><path d="M1466 562V662"/>
+  </g>
+  <circle cx="133" cy="612" r="33" fill="#FFF8E8" stroke="#2B2A27" stroke-width="12"/>
+  <path d="M113 612H153M133 592V632" stroke="#2B2A27" stroke-width="10" stroke-linecap="round"/>
+</svg>

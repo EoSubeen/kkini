@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" fill="none">
+  <rect width="1600" height="900" rx="48" fill="#FFF8E8"/>
+  <g font-family="Pretendard, Apple SD Gothic Neo, sans-serif" fill="#2B2A27">
+    <text x="96" y="112" font-size="44" font-weight="780">샌드위치 레이어 모듈</text>
+    <text x="96" y="158" font-size="24" fill="#6E675D">금액에 따라 세로 높이만 조절해 사용하는 재무 항목별 부품입니다.</text>
+  </g>
+  <g transform="translate(95 220)">
+    <g>
+      <rect width="420" height="120" rx="28" fill="#D95D50" stroke="#A43B34" stroke-width="7"/>
+      <circle cx="58" cy="60" r="20" fill="#F7A098"/><text x="100" y="72" fill="white" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="750">부모님 지원</text>
+    </g>
+    <g transform="translate(490 0)">
+      <rect width="420" height="120" rx="28" fill="#4F7B63" stroke="#2F5743" stroke-width="7"/>
+      <path d="M46 74L72 46M72 74L46 46" stroke="#B7D5C2" stroke-width="10" stroke-linecap="round"/><text x="105" y="72" fill="white" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="750">생활비</text>
+    </g>
+    <g transform="translate(980 0)">
+      <rect width="420" height="120" rx="28" fill="#5B678A" stroke="#37415F" stroke-width="7"/>
+      <circle cx="60" cy="60" r="18" fill="#9EABD1"/><text x="103" y="72" fill="white" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="750">대출 상환</text>
+    </g>
+    <g transform="translate(0 190)">
+      <rect width="420" height="120" rx="28" fill="#F5D64E" stroke="#B59113" stroke-width="7"/>
+      <path d="M56 36L80 60L56 84L32 60L56 36Z" fill="#FFF2A6"/><text x="102" y="72" fill="#5C4A00" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="750">보험료</text>
+    </g>
+    <g transform="translate(490 190)">
+      <rect width="420" height="120" rx="28" fill="#6DA9C7" stroke="#2C6E90" stroke-width="7"/>
+      <path d="M42 44H79V81H42V44ZM52 32V44M69 32V44" stroke="#DDF3FF" stroke-width="7" stroke-linecap="round"/><text x="105" y="72" fill="white" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="750">연금 납입</text>
+    </g>
+    <g transform="translate(980 190)">
+      <rect width="420" height="120" rx="28" fill="#F0B953" stroke="#C9862F" stroke-width="7"/>
+      <path d="M35 79L60 35L85 79H35Z" fill="#FFF2BD"/><text x="105" y="72" fill="#6B4510" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="750">교육비</text>
+    </g>
+  </g>
+  <g transform="translate(95 660)">
+    <rect width="1405" height="112" rx="28" fill="#F1E7D2"/>
+    <circle cx="62" cy="56" r="25" fill="#D95D50"/>
+    <path d="M62 40V60M62 75V76" stroke="white" stroke-width="7" stroke-linecap="round"/>
+    <text x="112" y="69" fill="#2B2A27" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="28"><tspan font-weight="750">적자 표현:</tspan><tspan dx="14">수입 기준선을 넘는 윗부분만 토마토 레드로 마스킹하세요.</tspan></text>
+  </g>
+</svg>
