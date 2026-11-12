@@ -7,6 +7,8 @@
 - `00_scope/acceptance.md`
 - `10_database/schema-evidence.md`
 - `20_api/api-evidence.md`
+- `25_design/design-spec.md`
+- `25_design/design-review.md`
 - `30_frontend/ui-evidence.md`
 - `40_integration/integration-report.md`
 - `50_release/release-evidence.md`
