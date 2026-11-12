@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import type { FinancialProfile } from "@/lib/contracts";
 import { Card, PageIntro, ProgressBar, SectionHeading } from "./ui";
 
 const steps = [
@@ -72,7 +73,79 @@ const selectStyle = {
   background: "white",
 };
 
-export function OnboardingForm({ defaultName = "" }: { defaultName?: string }) {
+/** 저장된 입력을 폼 기본값으로 바꾼다. 비율은 %로, 비어 있던 값은 빈칸으로 둔다. */
+function initialValues(profile?: FinancialProfile | null) {
+  if (!profile) return {} as Record<string, number | string | undefined>;
+  const pct = (value: number | null | undefined) =>
+    value === null || value === undefined ? undefined : Math.round(value * 1000) / 10;
+  const opt = (value: number | null | undefined) => (value === null || value === undefined ? undefined : value);
+  const zeroAsBlank = (value: number | null | undefined) => (value ? value : undefined);
+  return {
+    displayName: profile.displayName,
+    age: profile.age,
+    spouseAge: opt(profile.spouseAge),
+    child1Age: profile.childrenAges[0],
+    child2Age: profile.childrenAges[1],
+    child3Age: profile.childrenAges[2],
+    supportedParentAge: opt(profile.supportedParentAge),
+    monthlyNetIncome: profile.monthlyNetIncome,
+    annualGrossIncome: opt(profile.annualGrossIncome),
+    spouseMonthlyNetIncome: zeroAsBlank(profile.spouseMonthlyNetIncome),
+    spouseRetirementAge: profile.spouseRetirementAge,
+    retirementAge: profile.retirementAge,
+    wagePeakAge: profile.wagePeakAge,
+    wagePeakReductionRate: pct(profile.wagePeakReductionRate),
+    nationalPensionMonthly: opt(profile.nationalPensionMonthly),
+    nationalPensionStartAge: profile.nationalPensionStartAge,
+    spouseNationalPensionMonthly: zeroAsBlank(profile.spouseNationalPensionMonthly),
+    monthlyLivingExpense: profile.monthlyLivingExpense,
+    monthlyInsurancePremium: zeroAsBlank(profile.monthlyInsurancePremium),
+    annualCardSpend: opt(profile.annualCardSpend),
+    checkCardCashReceiptRate: profile.checkCardCashReceiptRate ? pct(profile.checkCardCashReceiptRate) : undefined,
+    annualTraditionalMarketSpend: zeroAsBlank(profile.annualTraditionalMarketSpend),
+    annualTransitSpend: zeroAsBlank(profile.annualTransitSpend),
+    monthlyParentSupport: zeroAsBlank(profile.monthlyParentSupport),
+    parentSupportYears: zeroAsBlank(profile.parentSupportYears),
+    annualUniversityTuitionPerChild: opt(profile.annualUniversityTuitionPerChild),
+    monthlyAcademyCostPerHighSchoolChild: opt(profile.monthlyAcademyCostPerHighSchoolChild),
+    targetMonthlyRetirementExpense: opt(profile.targetMonthlyRetirementExpense),
+    deposits: profile.deposits,
+    investments: zeroAsBlank(profile.investments),
+    unsecuredDebt: zeroAsBlank(profile.unsecuredDebt),
+    homeValue: zeroAsBlank(profile.homeValue),
+    mortgageBalance: zeroAsBlank(profile.mortgageBalance),
+    mortgageRate: pct(profile.mortgageRate),
+    mortgageYearsRemaining: zeroAsBlank(profile.mortgageYearsRemaining),
+    retirementPensionBalance: zeroAsBlank(profile.retirementPensionBalance),
+    personalPensionBalance: zeroAsBlank(profile.personalPensionBalance),
+    monthlyPersonalPensionContribution: zeroAsBlank(profile.monthlyPersonalPensionContribution),
+    otherAssets: zeroAsBlank(profile.otherAssets),
+    deathBenefit: opt(profile.deathBenefit),
+    cancerBenefit: opt(profile.cancerBenefit),
+    hasIndemnityInsurance: profile.hasIndemnityInsurance ? "yes" : "no",
+    indemnityInsuranceGeneration: profile.indemnityInsuranceGeneration,
+    monthlyIndemnityPremium: opt(profile.monthlyIndemnityPremium),
+    parentEstateValue: opt(profile.parentEstateValue),
+    parentHomeValue: opt(profile.parentHomeValue),
+    bothParentsAlive: profile.bothParentsAlive ? "yes" : "no",
+    siblingCountIncludingSelf: profile.siblingCountIncludingSelf,
+    plannedGiftPerChild: zeroAsBlank(profile.plannedGiftPerChild),
+    parentsMonthlyRecognizedIncome: opt(profile.parentsMonthlyRecognizedIncome),
+    householdPropertyMonthlyIncomeEquivalent: opt(profile.householdPropertyMonthlyIncomeEquivalent),
+  } as Record<string, number | string | undefined>;
+}
+
+export function OnboardingForm({
+  defaultName = "",
+  initialProfile = null,
+}: {
+  defaultName?: string;
+  initialProfile?: FinancialProfile | null;
+}) {
+  const saved = initialValues(initialProfile);
+  const has = (key: string) => saved[key] !== undefined;
+  /** 저장값이 있으면 저장값, 없으면 원래 기본값 */
+  const dv = (key: string, fallback?: number | string) => (has(key) ? saved[key] : fallback);
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [pending, setPending] = useState(false);
@@ -181,15 +254,15 @@ export function OnboardingForm({ defaultName = "" }: { defaultName?: string }) {
         <fieldset hidden={step !== 0} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="우리 가족" description="필수 항목은 이름과 내 나이예요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
-            <Field name="displayName" label="부를 이름" defaultValue={defaultName} required />
-            <Field name="age" label="내 나이" unit="세" min={25} max={80} required />
-            <Field name="spouseAge" label="배우자 나이" unit="세" max={120} />
-            <Field name="child1Age" label="첫째 자녀 나이" unit="세" max={120} />
-            <Field name="child2Age" label="둘째 자녀 나이" unit="세" max={120} />
-            <Field name="child3Age" label="셋째 자녀 나이" unit="세" max={120} />
-            <Field name="supportedParentAge" label="지원하는 부모님 나이" unit="세" max={120} />
+            <Field name="displayName" label="부를 이름" defaultValue={dv("displayName", defaultName) as string} required />
+            <Field name="age" defaultValue={dv("age")} label="내 나이" unit="세" min={25} max={80} required />
+            <Field name="spouseAge" defaultValue={dv("spouseAge")} label="배우자 나이" unit="세" max={120} />
+            <Field name="child1Age" defaultValue={dv("child1Age")} label="첫째 자녀 나이" unit="세" max={120} />
+            <Field name="child2Age" defaultValue={dv("child2Age")} label="둘째 자녀 나이" unit="세" max={120} />
+            <Field name="child3Age" defaultValue={dv("child3Age")} label="셋째 자녀 나이" unit="세" max={120} />
+            <Field name="supportedParentAge" defaultValue={dv("supportedParentAge")} label="지원하는 부모님 나이" unit="세" max={120} />
             <label className="choice">
-              <input name="parentNeedsCare" type="checkbox" />
+              <input name="parentNeedsCare" type="checkbox" defaultChecked={initialProfile?.parentNeedsCare ?? false} />
               <span className="choice__copy"><strong>부모님 돌봄이 필요해요</strong><span>식사·이동 등 일상생활 도움 기준</span></span>
             </label>
           </div>
@@ -198,30 +271,30 @@ export function OnboardingForm({ defaultName = "" }: { defaultName?: string }) {
         <fieldset hidden={step !== 1} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="버는 돈" description="금액 단위는 만 원이에요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
-            <Field name="monthlyNetIncome" label="월 세후소득" unit="만 원" required />
-            <Field name="annualGrossIncome" label="연봉" unit="만 원" />
-            <Field name="spouseMonthlyNetIncome" label="배우자 월 세후소득" unit="만 원" />
-            <Field name="spouseRetirementAge" label="배우자 정년" unit="세" defaultValue={60} max={80} />
-            <Field name="retirementAge" label="내 정년" unit="세" defaultValue={60} max={80} />
-            <Field name="wagePeakAge" label="임금피크 시작" unit="세" defaultValue={56} max={80} />
-            <Field name="wagePeakReductionRate" label="임금 감소율" unit="%" defaultValue={20} max={100} />
-            <Field name="nationalPensionMonthly" label="국민연금 예상 월액" unit="만 원" />
-            <Field name="nationalPensionStartAge" label="국민연금 시작 나이" unit="세" defaultValue={65} max={80} />
-            <Field name="spouseNationalPensionMonthly" label="배우자 국민연금 월액" unit="만 원" />
+            <Field name="monthlyNetIncome" defaultValue={dv("monthlyNetIncome")} label="월 세후소득" unit="만 원" required />
+            <Field name="annualGrossIncome" defaultValue={dv("annualGrossIncome")} label="연봉" unit="만 원" />
+            <Field name="spouseMonthlyNetIncome" defaultValue={dv("spouseMonthlyNetIncome")} label="배우자 월 세후소득" unit="만 원" />
+            <Field name="spouseRetirementAge" label="배우자 정년" unit="세" defaultValue={dv("spouseRetirementAge", 60)} max={80} />
+            <Field name="retirementAge" label="내 정년" unit="세" defaultValue={dv("retirementAge", 60)} max={80} />
+            <Field name="wagePeakAge" label="임금피크 시작" unit="세" defaultValue={dv("wagePeakAge", 56)} max={80} />
+            <Field name="wagePeakReductionRate" label="임금 감소율" unit="%" defaultValue={dv("wagePeakReductionRate", 20)} max={100} />
+            <Field name="nationalPensionMonthly" defaultValue={dv("nationalPensionMonthly")} label="국민연금 예상 월액" unit="만 원" />
+            <Field name="nationalPensionStartAge" label="국민연금 시작 나이" unit="세" defaultValue={dv("nationalPensionStartAge", 65)} max={80} />
+            <Field name="spouseNationalPensionMonthly" defaultValue={dv("spouseNationalPensionMonthly")} label="배우자 국민연금 월액" unit="만 원" />
           </div>
         </fieldset>
 
         <fieldset hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="쓰는 돈" description="대출 원리금은 자산·빚 단계에서 계산해요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
-            <Field name="monthlyLivingExpense" label="월 생활비" unit="만 원" required />
-            <Field name="monthlyInsurancePremium" label="월 보험료" unit="만 원" />
-            <Field name="annualCardSpend" label="연 카드·현금영수증" unit="만 원" />
-            <Field name="checkCardCashReceiptRate" label="체크카드·현금 비중" unit="%" max={100} />
-            <Field name="annualTraditionalMarketSpend" label="연 전통시장 사용액" unit="만 원" />
-            <Field name="annualTransitSpend" label="연 대중교통 사용액" unit="만 원" />
-            <Field name="monthlyParentSupport" label="월 부모님 지원" unit="만 원" />
-            <Field name="parentSupportYears" label="앞으로 지원할 기간" unit="년" max={50} />
+            <Field name="monthlyLivingExpense" defaultValue={dv("monthlyLivingExpense")} label="월 생활비" unit="만 원" required />
+            <Field name="monthlyInsurancePremium" defaultValue={dv("monthlyInsurancePremium")} label="월 보험료" unit="만 원" />
+            <Field name="annualCardSpend" defaultValue={dv("annualCardSpend")} label="연 카드·현금영수증" unit="만 원" />
+            <Field name="checkCardCashReceiptRate" defaultValue={dv("checkCardCashReceiptRate")} label="체크카드·현금 비중" unit="%" max={100} />
+            <Field name="annualTraditionalMarketSpend" defaultValue={dv("annualTraditionalMarketSpend")} label="연 전통시장 사용액" unit="만 원" />
+            <Field name="annualTransitSpend" defaultValue={dv("annualTransitSpend")} label="연 대중교통 사용액" unit="만 원" />
+            <Field name="monthlyParentSupport" defaultValue={dv("monthlyParentSupport")} label="월 부모님 지원" unit="만 원" />
+            <Field name="parentSupportYears" defaultValue={dv("parentSupportYears")} label="앞으로 지원할 기간" unit="년" max={50} />
             <Field name="annualUniversityTuitionPerChild" label="자녀 1명 대학 등록금" unit="만 원/년" defaultValue={823} />
             <Field name="monthlyAcademyCostPerHighSchoolChild" label="고교생 1명 학원비" unit="만 원/월" defaultValue={79} />
             <Field name="targetMonthlyRetirementExpense" label="은퇴 뒤 목표 생활비" unit="만 원/월" defaultValue={298} />
@@ -231,41 +304,41 @@ export function OnboardingForm({ defaultName = "" }: { defaultName?: string }) {
         <fieldset hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="가진 것과 빚" description="금액 단위는 만 원이에요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
-            <Field name="deposits" label="예금·적금" unit="만 원" required />
-            <Field name="investments" label="주식·펀드" unit="만 원" />
-            <Field name="unsecuredDebt" label="신용대출·마이너스통장" unit="만 원" />
-            <Field name="homeValue" label="집 시세" unit="만 원" />
-            <Field name="mortgageBalance" label="주택담보대출 잔액" unit="만 원" />
-            <Field name="mortgageRate" label="주택담보대출 금리" unit="%" defaultValue={4.2} max={100} />
-            <Field name="mortgageYearsRemaining" label="대출 남은 기간" unit="년" max={50} />
-            <Field name="retirementPensionBalance" label="퇴직연금 잔액" unit="만 원" />
-            <Field name="personalPensionBalance" label="연금저축·IRP 잔액" unit="만 원" />
-            <Field name="monthlyPersonalPensionContribution" label="월 개인연금 납입액" unit="만 원" />
-            <Field name="otherAssets" label="자동차 등 기타 자산" unit="만 원" />
+            <Field name="deposits" defaultValue={dv("deposits")} label="예금·적금" unit="만 원" required />
+            <Field name="investments" defaultValue={dv("investments")} label="주식·펀드" unit="만 원" />
+            <Field name="unsecuredDebt" defaultValue={dv("unsecuredDebt")} label="신용대출·마이너스통장" unit="만 원" />
+            <Field name="homeValue" defaultValue={dv("homeValue")} label="집 시세" unit="만 원" />
+            <Field name="mortgageBalance" defaultValue={dv("mortgageBalance")} label="주택담보대출 잔액" unit="만 원" />
+            <Field name="mortgageRate" label="주택담보대출 금리" unit="%" defaultValue={dv("mortgageRate", 4.2)} max={100} />
+            <Field name="mortgageYearsRemaining" defaultValue={dv("mortgageYearsRemaining")} label="대출 남은 기간" unit="년" max={50} />
+            <Field name="retirementPensionBalance" defaultValue={dv("retirementPensionBalance")} label="퇴직연금 잔액" unit="만 원" />
+            <Field name="personalPensionBalance" defaultValue={dv("personalPensionBalance")} label="연금저축·IRP 잔액" unit="만 원" />
+            <Field name="monthlyPersonalPensionContribution" defaultValue={dv("monthlyPersonalPensionContribution")} label="월 개인연금 납입액" unit="만 원" />
+            <Field name="otherAssets" defaultValue={dv("otherAssets")} label="자동차 등 기타 자산" unit="만 원" />
           </div>
         </fieldset>
 
         <fieldset hidden={step !== 4} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="보험·상속" description="선택 정보이며 모르면 비워도 돼요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
-            <Field name="deathBenefit" label="사망보험금" unit="만 원" />
-            <Field name="cancerBenefit" label="암 진단비" unit="만 원" />
-            <div className="form-field"><label htmlFor="hasIndemnityInsurance">실손보험</label><select id="hasIndemnityInsurance" name="hasIndemnityInsurance" style={selectStyle} defaultValue="no"><option value="no">없음</option><option value="yes">있음</option></select></div>
-            <div className="form-field"><label htmlFor="indemnityInsuranceGeneration">실손 세대</label><select id="indemnityInsuranceGeneration" name="indemnityInsuranceGeneration" style={selectStyle} defaultValue="unknown"><option value="unknown">모름</option><option value="1">1세대</option><option value="2">2세대</option><option value="3">3세대</option><option value="4">4세대</option><option value="5">5세대</option></select></div>
-            <Field name="monthlyIndemnityPremium" label="월 실손 보험료" unit="만 원" />
-            <Field name="parentEstateValue" label="부모님 재산" unit="만 원" />
-            <Field name="parentHomeValue" label="부모님 집 시세" unit="만 원" />
-            <div className="form-field"><label htmlFor="bothParentsAlive">부모님 두 분 모두 계신가요?</label><select id="bothParentsAlive" name="bothParentsAlive" style={selectStyle} defaultValue="yes"><option value="yes">예</option><option value="no">아니오</option></select></div>
-            <Field name="siblingCountIncludingSelf" label="나를 포함한 형제자매" unit="명" defaultValue={1} min={1} max={20} />
-            <Field name="plannedGiftPerChild" label="자녀 1명 결혼 지원 계획" unit="만 원" />
+            <Field name="deathBenefit" defaultValue={dv("deathBenefit")} label="사망보험금" unit="만 원" />
+            <Field name="cancerBenefit" defaultValue={dv("cancerBenefit")} label="암 진단비" unit="만 원" />
+            <div className="form-field"><label htmlFor="hasIndemnityInsurance">실손보험</label><select id="hasIndemnityInsurance" name="hasIndemnityInsurance" style={selectStyle} defaultValue={dv("hasIndemnityInsurance", "no")}><option value="no">없음</option><option value="yes">있음</option></select></div>
+            <div className="form-field"><label htmlFor="indemnityInsuranceGeneration">실손 세대</label><select id="indemnityInsuranceGeneration" name="indemnityInsuranceGeneration" style={selectStyle} defaultValue={dv("indemnityInsuranceGeneration", "unknown")}><option value="unknown">모름</option><option value="1">1세대</option><option value="2">2세대</option><option value="3">3세대</option><option value="4">4세대</option><option value="5">5세대</option></select></div>
+            <Field name="monthlyIndemnityPremium" defaultValue={dv("monthlyIndemnityPremium")} label="월 실손 보험료" unit="만 원" />
+            <Field name="parentEstateValue" defaultValue={dv("parentEstateValue")} label="부모님 재산" unit="만 원" />
+            <Field name="parentHomeValue" defaultValue={dv("parentHomeValue")} label="부모님 집 시세" unit="만 원" />
+            <div className="form-field"><label htmlFor="bothParentsAlive">부모님 두 분 모두 계신가요?</label><select id="bothParentsAlive" name="bothParentsAlive" style={selectStyle} defaultValue={dv("bothParentsAlive", "yes")}><option value="yes">예</option><option value="no">아니오</option></select></div>
+            <Field name="siblingCountIncludingSelf" label="나를 포함한 형제자매" unit="명" defaultValue={dv("siblingCountIncludingSelf", 1)} min={1} max={20} />
+            <Field name="plannedGiftPerChild" defaultValue={dv("plannedGiftPerChild")} label="자녀 1명 결혼 지원 계획" unit="만 원" />
           </div>
         </fieldset>
 
         <fieldset hidden={step !== 5} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="복지 확인용" description="복지 가능성을 대략 가늠하는 데만 사용해요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
-            <Field name="parentsMonthlyRecognizedIncome" label="부모님 월 소득인정액" unit="만 원" />
-            <Field name="householdPropertyMonthlyIncomeEquivalent" label="우리 집 재산의 월 소득환산액" unit="만 원" />
+            <Field name="parentsMonthlyRecognizedIncome" defaultValue={dv("parentsMonthlyRecognizedIncome")} label="부모님 월 소득인정액" unit="만 원" />
+            <Field name="householdPropertyMonthlyIncomeEquivalent" defaultValue={dv("householdPropertyMonthlyIncomeEquivalent")} label="우리 집 재산의 월 소득환산액" unit="만 원" />
             <p className="notice">입력값과 계산 결과는 로그인한 계정에 저장돼요. 다른 사용자는 볼 수 없어요.</p>
           </div>
         </fieldset>

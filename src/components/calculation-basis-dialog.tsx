@@ -32,7 +32,7 @@ export function CalculationBasisDialog() {
         <div className="basis-dialog__body">
           <article>
             <strong>월수지</strong>
-            <p>세후 소득에서 생활비·보험료·부모님 지원·대출 원리금·교육비를 뺀 값이에요.</p>
+            <p>세후 소득에서 생활비·보험료·부모님 지원·대출 원리금·교육비·연금 납입을 뺀 값이에요. 해마다 달라지는 연말정산 환급은 넣지 않아요.</p>
           </article>
           <article>
             <strong>95세 금융·연금 자산</strong>
@@ -40,7 +40,7 @@ export function CalculationBasisDialog() {
           </article>
           <article>
             <strong>주택연금</strong>
-            <p>화면의 월액은 교육용 추정치예요. 이사 후에는 새 집 가격과 가입 나이로 공사 조회값을 다시 확인해야 해요.</p>
+            <p>부부 중 나이가 적은 분의 가입 나이로 주택금융공사 일람표(2026.6.1)를 적용한 추정치예요. 이사 후에는 새 집 가격으로 공사 조회값을 다시 확인해야 해요.</p>
           </article>
           <p className="notice">이 서비스는 재무설계 교육·모의계산 도구예요. 실제 결정 전 공식 기관 조회와 전문가 상담을 거쳐 주세요.</p>
         </div>

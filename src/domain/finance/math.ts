@@ -23,10 +23,12 @@ export function loanBalance(
   );
 }
 
+// startAge는 부부 중 나이가 적은 사람의 가입 나이여야 한다(주택금융공사 기준).
 export function reverseMortgageMonthly(homeValue: number, startAge = 65) {
   const points: Array<[number, number]> = [
     [55, 93.6],
     [60, 126.4],
+    [63, 141.0],
     [65, 151.7],
   ];
   const cappedAge = Math.max(55, Math.min(65, startAge));

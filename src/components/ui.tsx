@@ -119,3 +119,15 @@ export const diagnosisTabs = [
   { href: "/diagnosis/timeline", label: "미래 타임라인" },
   { href: "/diagnosis/family", label: "가족 안전망" },
 ];
+
+export const recipeTabs = [
+  { href: "/recipe", label: "추천 조합" },
+  { href: "/recipe/alternatives", label: "분야별 대안" },
+  { href: "/recipe/plan", label: "실행 계획" },
+];
+
+export const checkTabs = [
+  { href: "/check/shock", label: "충격 테스트" },
+  { href: "/check", label: "계획 추적" },
+  { href: "/check/report", label: "근거·리포트" },
+];
