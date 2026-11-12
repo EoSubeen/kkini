@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 export interface LatestState {
   profile: FinancialProfile | null;
   profileSavedAt: string | null;
-  /** 가장 최근에 고른 레시피 조합(비어 있지 않은 것). 없으면 null */
+  /** 가장 최근에 고른 레시피 조합. 전부 해제한 빈 조합도 유지한다. */
   selection: RecipeSelection | null;
 }
 
@@ -24,7 +24,6 @@ export async function getLatestState(): Promise<LatestState> {
     supabase
       .from("recipe_selections")
       .select("selected_recipe_ids, housing, created_at")
-      .neq("selected_recipe_ids", "{}")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),

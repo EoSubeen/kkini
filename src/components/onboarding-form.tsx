@@ -295,9 +295,9 @@ export function OnboardingForm({
             <Field name="annualTransitSpend" defaultValue={dv("annualTransitSpend")} label="연 대중교통 사용액" unit="만 원" />
             <Field name="monthlyParentSupport" defaultValue={dv("monthlyParentSupport")} label="월 부모님 지원" unit="만 원" />
             <Field name="parentSupportYears" defaultValue={dv("parentSupportYears")} label="앞으로 지원할 기간" unit="년" max={50} />
-            <Field name="annualUniversityTuitionPerChild" label="자녀 1명 대학 등록금" unit="만 원/년" defaultValue={823} />
-            <Field name="monthlyAcademyCostPerHighSchoolChild" label="고교생 1명 학원비" unit="만 원/월" defaultValue={79} />
-            <Field name="targetMonthlyRetirementExpense" label="은퇴 뒤 목표 생활비" unit="만 원/월" defaultValue={298} />
+            <Field name="annualUniversityTuitionPerChild" label="자녀 1명 대학 등록금" unit="만 원/년" defaultValue={dv("annualUniversityTuitionPerChild", 823)} />
+            <Field name="monthlyAcademyCostPerHighSchoolChild" label="고교생 1명 학원비" unit="만 원/월" defaultValue={dv("monthlyAcademyCostPerHighSchoolChild", 79)} />
+            <Field name="targetMonthlyRetirementExpense" label="은퇴 뒤 목표 생활비" unit="만 원/월" defaultValue={dv("targetMonthlyRetirementExpense", 298)} />
           </div>
         </fieldset>
 
