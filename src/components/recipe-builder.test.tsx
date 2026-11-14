@@ -1,12 +1,16 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { kimSandProfile } from "@/domain/finance";
 import { RecipeBuilder } from "./recipe-builder";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }));
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 const savedSelection = {
   selectedRecipeIds: ["basic", "reemp", "hp"] as ("basic" | "reemp" | "hp")[],
@@ -50,5 +54,23 @@ describe("RecipeBuilder", () => {
     expect(reverseMortgage).not.toBeChecked();
     expect(reverseMortgage).toBeDisabled();
     expect(screen.getByText("이사 후 주택연금은 새 집 기준으로 월액을 다시 확인해 주세요.")).toBeInTheDocument();
+  });
+
+  it("shows the completed sandwich with a top bread after saving", async () => {
+    Object.defineProperty(window, "scrollTo", {
+      configurable: true,
+      value: vi.fn(),
+    });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ result: { monthlyCashFlow: -45, depletionAge: 60, assetsAt95: -227_000 } }),
+    }));
+    render(<RecipeBuilder initialProfile={kimSandProfile} initialSelection={savedSelection} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "샌드위치 완성하기" }));
+
+    expect(await screen.findByRole("heading", { name: "김샌드 님의 실행 샌드위치" })).toBeVisible();
+    expect(screen.getByAltText("샌드위치를 덮은 윗빵")).toBeVisible();
+    expect(screen.getByRole("button", { name: "실행 계획 보기" })).toBeVisible();
   });
 });

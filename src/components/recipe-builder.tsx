@@ -123,10 +123,15 @@ export function RecipeBuilder({
   const [recommended, setRecommended] = useState<string[]>([]);
   const [recommendNote, setRecommendNote] = useState("");
   const [finding, setFinding] = useState(false);
+  const [completed, setCompleted] = useState(false);
   const requestId = useRef(0);
   const category = categories.find((item) => item.id === categoryId) ?? categories[0];
 
   const selectedIngredients = useMemo(() => categories.flatMap((group) => group.ingredients.filter((item) => selected[group.id]?.includes(item.id))), [selected]);
+  const selectedBread = categories[0].ingredients.find((item) => selected.bread?.includes(item.id));
+  const topBreadImage = selectedBread?.id === "baguette"
+    ? "/kkini/ingredients/bread/baguette-top.png"
+    : selectedBread?.image ?? "/kkini/ingredients/bread/baguette-top.png";
   const selectedRecipeIds = useMemo(() => {
     const ids = recipesFromSelection(selected);
     if (downsizing) return [...ids.filter((id) => id !== "hp"), "down"];
@@ -261,12 +266,74 @@ export function RecipeBuilder({
       if (!calculateResponse.ok) {
         throw new Error(calculatePayload?.error?.message ?? "레시피 결과를 저장하지 못했어요.");
       }
-      router.push("/recipe/plan");
+      setPreview(calculatePayload.result as Preview);
+      setCompleted(true);
+      window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
       router.refresh();
     } catch (caught) {
       setSaveError(caught instanceof Error ? caught.message : "잠시 후 다시 시도해 주세요.");
       setSaving(false);
     }
+  }
+
+  if (completed) {
+    const owner = initialProfile?.displayName.replace(/\s*님\s*$/, "").trim() || "나";
+    return (
+      <div className="page-stack recipe-complete">
+        <SegmentTabs items={recipeTabs} current="/recipe" />
+        <section className="recipe-complete__hero">
+          <span>레시피 완성 ✓</span>
+          <h1>{owner} 님의 실행 샌드위치</h1>
+          <p>선택한 재료가 오늘부터 실행할 재무 행동이 됐어요.</p>
+        </section>
+
+        <div className="builder-stage builder-stage--complete" aria-label={`완성된 ${selectedIngredients.length}개 재료 샌드위치`}>
+          <span className="builder-stage__badge">레시피 완성 ✓</span>
+          <span className="builder-stage__plate">
+            <Image src="/kkini/plate.png" alt="" fill sizes="(max-width: 540px) 96vw, 430px" loading="eager" />
+          </span>
+          <div className="builder-layers">
+            {selectedIngredients.map((item, index) => (
+              <span className="builder-layer" style={{ "--layer-bottom": `${index * 11}px` } as React.CSSProperties} key={`complete-${item.id}`}>
+                <Image src={item.image} alt={item.name} fill sizes="(max-width: 540px) 92vw, 420px" loading="eager" />
+              </span>
+            ))}
+            <span className="builder-layer builder-layer--top" style={{ "--layer-bottom": `${Math.max(0, selectedIngredients.length * 8 - 12)}px` } as React.CSSProperties}>
+              <Image src={topBreadImage} alt="샌드위치를 덮은 윗빵" fill sizes="(max-width: 540px) 92vw, 420px" loading="eager" />
+            </span>
+          </div>
+        </div>
+
+        <section className="section-stack">
+          <SectionHeading title={`선택한 ${selectedIngredients.length}가지 재료`} action={<span className="report-card__tag">{selectedIngredients.length}개 재료</span>} />
+          <div className="completed-ingredients">
+            {selectedIngredients.map((item) => (
+              <div className="completed-ingredient" key={`summary-${item.id}`}>
+                <span><Image src={item.image} alt="" fill sizes="88px" /></span>
+                <strong>{item.name}</strong>
+                <small>{item.meaning.split("·")[0].trim()}</small>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {preview ? (
+          <Card tone="green" className="section-stack">
+            <SectionHeading title="이 레시피를 실행하면" />
+            <div className="metric-grid">
+              <Metric label="이번 달 월수지" value={won(preview.monthlyCashFlow)} status={preview.monthlyCashFlow >= 0 ? "good" : "warn"} />
+              <Metric label="금융자산" value={preview.depletionAge === null ? "95세까지 유지" : `${preview.depletionAge}세 고갈`} status={preview.depletionAge === null ? "good" : "risk"} />
+              <Metric label="95세 금융·연금 자산" value={eok(preview.assetsAt95)} status={preview.assetsAt95 >= 0 ? "good" : "risk"} />
+            </div>
+          </Card>
+        ) : null}
+
+        <div className="button-row">
+          <button className="button-secondary" type="button" onClick={() => setCompleted(false)}>재료 다시 고르기</button>
+          <button className="button" type="button" onClick={() => router.push("/recipe/plan")}>실행 계획 보기</button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -302,7 +369,7 @@ export function RecipeBuilder({
           {selectedIngredients.map((item, index) => (
             <span
               className="builder-layer"
-              style={{ "--layer-bottom": `${index * 14}px` } as React.CSSProperties}
+              style={{ "--layer-bottom": `${index * 11}px` } as React.CSSProperties}
               key={`${item.id}-${index}`}
             >
               <Image src={item.image} alt={item.name} fill sizes="(max-width: 540px) 88vw, 390px" loading="eager" />
@@ -359,7 +426,7 @@ export function RecipeBuilder({
 
       {preview?.notices?.length ? <ul className="notice" style={{ margin: 0, paddingLeft: 18 }}>{preview.notices.slice(1).map((notice) => <li key={notice}>{notice}</li>)}</ul> : null}
       {saveError ? <p className="notice notice--warn" role="alert">{saveError}</p> : null}
-      <div className="button-row"><CalculationBasisDialog /><button className="button" type="button" disabled={saving} aria-busy={saving} onClick={saveRecipe}>{saving ? "저장 중…" : "이 조합으로 결과 보기"}</button></div>
+      <div className="button-row"><CalculationBasisDialog /><button className="button" type="button" disabled={saving} aria-busy={saving} onClick={saveRecipe}>{saving ? "완성 중…" : "샌드위치 완성하기"}</button></div>
     </div>
   );
 }
