@@ -103,7 +103,7 @@ release_recommendation: RELEASE_ACCEPTED
 
 ## 운영 메모
 
-1. Vercel과 GitHub 연결이 없으므로 현재 릴리스는 CLI 배포를 사용한다. 자동 배포가 필요하면 Vercel 계정에 GitHub login connection을 추가한다.
+1. Vercel 프로젝트는 GitHub `EoSubeen/kkini`와 연결되었고 Production 브랜치는 `main`이다. 확인용 커밋 `4c3aa6d`를 push했을 때 Production 배포 `dpl_GivmSThcXmTQg2FJQw75oa34c7mi`가 자동 생성되어 Ready가 됐고, `kkinisandwich.vercel.app`도 새 배포로 이동했다.
 2. Supabase 시스템 로그의 `realtime.subscription` exporter 경고는 제품 요청과 무관한 관리형 플랫폼 지표 수집 잡음으로 분류했다.
 
 ## 정확한 재현 명령
