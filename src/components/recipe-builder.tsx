@@ -337,7 +337,7 @@ export function RecipeBuilder({
   }
 
   return (
-    <div className="page-stack">
+    <div className="page-stack recipe-builder-page">
       <SegmentTabs items={recipeTabs} current="/recipe" />
       <PageIntro eyebrow="추천 조합" title="내 재무 레시피를 샌드위치로 만들어요" description="진단 결과와 목표를 바탕으로 여섯 가지 재료를 하나씩 골라요." trailing={<span className="report-card__tag">{selectedIngredients.length}개 선택</span>} />
 
@@ -378,6 +378,12 @@ export function RecipeBuilder({
         </div>
       </div>
 
+      <div className="ingredient-tabs" role="tablist" aria-label="재료 카테고리">
+        {categories.map((item) => (
+          <button key={item.id} type="button" role="tab" aria-selected={item.id === categoryId} data-active={item.id === categoryId} onClick={() => setCategoryId(item.id)}>{item.label}</button>
+        ))}
+      </div>
+
       {preview ? (
         <Card className="section-stack">
           <SectionHeading title="이 조합으로 계산하면" description={base ? `지금 그대로: 이번 달 ${won(base.monthlyCashFlow)} · ${base.depletionAge === null ? "95세까지 유지" : `${base.depletionAge}세 고갈`}` : undefined} />
@@ -388,12 +394,6 @@ export function RecipeBuilder({
           </div>
         </Card>
       ) : null}
-
-      <div className="ingredient-tabs" role="tablist" aria-label="재료 카테고리">
-        {categories.map((item) => (
-          <button key={item.id} type="button" role="tab" aria-selected={item.id === categoryId} data-active={item.id === categoryId} onClick={() => setCategoryId(item.id)}>{item.label}</button>
-        ))}
-      </div>
 
       <section className="section-stack" role="tabpanel">
         <SectionHeading title={category.title} description={category.description} action={<span className="report-card__tag">{category.max === 1 ? "1개 선택" : `최대 ${category.max}개`}</span>} />

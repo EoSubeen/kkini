@@ -2,7 +2,7 @@
 
 - Producer: `ui-ux-designer`
 - Consumer: `frontend`, `qa-release`
-- Status: `incomplete`
+- Status: `approved-for-frontend-pass`
 - Source of truth: Figma
 
 ## 화면 기준
@@ -17,7 +17,13 @@
 
 ## 디자인 토큰
 
-- Typeface: Pretendard
+- Typeface: Pretendard for body/UI/data; Gmarket Sans for brand and hero headings
+- Palette: Ink `#18231E`, Trust `#245843`, Herb `#34755B`, Fresh `#E7F2EC`, Crust `#E88943`, Paper `#FFFDF9`
+- Radius: `12px` for controls, `20px` for the single focal panel, pill shapes only for status/progress
+- Elevation: 1px borders and whitespace by default; shadow only for overlays
+- Page grammar: Home = branded daily summary; Diagnosis = open financial ledger; Recipe = tactile assembly tray; Check = action checklist; Settings = quiet system UI
+- Card rule: use a maximum of one dominant filled panel per page. Render supporting information as open sections with dividers.
+- Asset rule: use one focal 3D illustration per screen. Do not repeat the mascot as decoration or mix it with unrelated illustration styles.
 - Mobile frame: 유동 폭 `100%`, 최대 `540px`
 - Review widths: `320 / 375 / 390 / 412px`
 - Touch target: 최소 `44 × 44px`

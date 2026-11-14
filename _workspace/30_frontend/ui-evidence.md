@@ -3,7 +3,7 @@
 ## Visual direction
 
 - Palette: deep green `#173F32`, action green `#34755B`, soft green `#E7F2EC`, white, warm orange `#E88943`, risk red `#D95B4E`.
-- Type: Pretendard-first Korean system stack.
+- Type: Gmarket Sans for brand/hero moments, Pretendard for UI, body copy and financial data.
 - Layout: 20px mobile gutters, 4/8px spacing rhythm, 20–28px card radii, restrained shadows.
 - Signature interaction: ingredients stack on a white plate; the rest of the interface stays quiet and data-led.
 - Controls: Lucide outline icons, 44px minimum touch targets, visible focus rings, reduced-motion support.
@@ -23,6 +23,8 @@
 - [x] Calculation-basis modal and education-purpose disclaimer
 - [x] Check progress and checklist
 - [x] Settings and auth forms
+- [x] Home, diagnosis and check each use a distinct page grammar instead of repeating the same card stack
+- [x] One focal illustration per redesigned screen; decorative imagery remains outside the accessibility tree
 
 ## Interaction regression tests
 
@@ -33,4 +35,10 @@
 
 ## QA handoff
 
-Run full E2E after Auth/API integration. At minimum cover signup → profile → diagnosis → recipe → check persistence, logout/login restore, 375px and 390px widths, keyboard focus, dialog close, loading/error states, and cross-user isolation.
+Verified in this pass:
+
+- `npm run verify`: lint, typecheck, 26 unit tests and production build passed.
+- `npm run test:e2e`: 3 mobile-chrome public authentication/navigation checks passed.
+- Authenticated persistence was skipped because `RUN_SUPABASE_E2E` was not enabled.
+
+Follow-up QA: run the authenticated signup → profile → diagnosis → recipe → check persistence flow at 375px and 390px, plus landscape, largest text, dark mode, keyboard focus, dialog close, loading/error states and cross-user isolation.
