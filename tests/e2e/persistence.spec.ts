@@ -31,7 +31,9 @@ test.describe("authenticated persistence", () => {
   test.skip(!process.env.RUN_SUPABASE_E2E, "requires the local Supabase stack");
 
   test("signup, diagnosis and checklist survive logout and login", async ({ page }) => {
-    const email = `qa-${Date.now()}@example.test`;
+    test.setTimeout(90_000);
+    const emailDomain = process.env.E2E_EMAIL_DOMAIN ?? "example.test";
+    const email = `qa-${Date.now()}@${emailDomain}`;
     const password = "Kkini-test-2026!";
 
     await page.goto("/signup");
@@ -60,8 +62,12 @@ test.describe("authenticated persistence", () => {
     await page.goto("/check");
     const expense = page.getByRole("checkbox", { name: /생활비 10% 조정/ });
     await expect(expense).toBeEnabled();
+    const saveResponse = page.waitForResponse((response) =>
+      response.url().endsWith("/api/checks") && response.request().method() === "PUT",
+    );
     await expense.check();
-    await expect(page.getByText(/1개 완료/)).toBeVisible();
+    expect((await saveResponse).ok()).toBe(true);
+    await expect(page.getByText("1개 완료 · 3개 남음", { exact: true })).toBeVisible();
 
     await page.goto("/settings");
     await page.getByRole("button", { name: /로그아웃/ }).click();

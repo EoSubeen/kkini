@@ -1,7 +1,9 @@
 begin;
+set local role postgres;
 
 create extension if not exists pgtap with schema extensions;
-select plan(5);
+set local search_path = public, extensions;
+select extensions.plan(5);
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -13,15 +15,15 @@ insert into auth.users (
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000001', true);
 
-select lives_ok(
+select extensions.lives_ok(
   $$insert into public.households (id, user_id, label) values ('30000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000001', '우리 집')$$,
   'owner can insert an owned household'
 );
-select is((select count(*)::integer from public.households), 1, 'owner can read the owned household');
+select extensions.is((select count(*)::integer from public.households), 1, 'owner can read the owned household');
 
 select set_config('request.jwt.claim.sub', '20000000-0000-0000-0000-000000000002', true);
-select is((select count(*)::integer from public.households), 0, 'another user cannot read the owner household');
-select throws_ok(
+select extensions.is((select count(*)::integer from public.households), 0, 'another user cannot read the owner household');
+select extensions.throws_ok(
   $$insert into public.households (user_id, label) values ('10000000-0000-0000-0000-000000000001', '탈취 시도')$$,
   '42501',
   'new row violates row-level security policy for table "households"',
@@ -30,8 +32,8 @@ select throws_ok(
 
 set local role anon;
 select set_config('request.jwt.claim.sub', '', true);
-select is((select count(*)::integer from public.households), 0, 'anonymous users cannot read households');
+select extensions.is((select count(*)::integer from public.households), 0, 'anonymous users cannot read households');
 
-reset role;
-select * from finish();
+set local role postgres;
+select * from extensions.finish();
 rollback;

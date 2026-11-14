@@ -23,8 +23,8 @@ api_url = "http://127.0.0.1"
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://127.0.0.1:3000/auth/callback", "http://localhost:3000/auth/callback", "http://127.0.0.1:3000/auth/confirm", "http://localhost:3000/auth/confirm"]
+site_url = "https://kkinisandwich.vercel.app"
+additional_redirect_urls = ["https://kkinisandwich.vercel.app/auth/callback", "https://kkinisandwich.vercel.app/auth/confirm", "http://127.0.0.1:3000/auth/callback", "http://localhost:3000/auth/callback", "http://127.0.0.1:3000/auth/confirm", "http://localhost:3000/auth/confirm"]
 jwt_expiry = 3600
 enable_signup = true
 enable_anonymous_sign_ins = false

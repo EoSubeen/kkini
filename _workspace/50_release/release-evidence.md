@@ -1,19 +1,19 @@
 # 끼니 QA·Release evidence
 
 ```yaml
-status: PARTIAL
+status: READY_FOR_PRODUCTION_PROMOTION
 producer: qa-release
 consumer: architecture-supervisor
-target_ref: main@67c7924 plus this QA patch
-verified_at: 2026-11-14 Asia/Seoul
-release_recommendation: ALLOW_PREVIEW_BLOCK_PRODUCTION
+target_ref: main@ce779ee plus this QA patch
+verified_at: 2026-11-15 Asia/Seoul
+release_recommendation: ALLOW_PRODUCTION_AFTER_ENV_CONFIGURATION
 ```
 
 ## 결론
 
-커밋 `67c7924` 기준 코드 품질·금융 회귀·빌드는 통과했다. 공개 인증 화면은 375px, 390px, 가로 화면, 200% 브라우저 확대, 축소 모션에서 가로 넘침 없이 동작했다. 첫 실행에서 인증 전환 링크가 44px 터치 기준에 미달하는 P2를 발견했고, 공유 작업 트리에 반영된 CSS 보강 후 재실행에서 통과했다.
+커밋 `ce779ee` 기준 코드를 Vercel Preview와 관리형 Supabase 프로젝트에 연결했다. 회원가입→6단계 입력→진단→점검 저장→로그아웃→재로그인→진단·점검 복원 E2E가 실제 원격 DB에서 통과했다. 인증 사용자 A/B 격리와 전체 RLS 정책을 검사하는 pgTAP 22건도 원격 DB에서 통과했다.
 
-현재 Docker daemon에 접근할 수 없어 최신 코드로 로컬 Supabase, pgTAP RLS, 회원가입부터 재로그인 복원까지의 전체 E2E를 재실행하지 못했다. 따라서 프리뷰는 허용하되 프로덕션 배포는 차단한다.
+프리뷰 로그에서 애플리케이션 오류·경고, Supabase Auth 오류, PostgREST 오류는 확인되지 않았다. 업데이트된 코드 게이트를 다시 통과하고 동일한 환경변수를 Vercel Production에 설정한 뒤 공개 URL에서 스모크 테스트를 통과하면 프로덕션 승격이 가능하다.
 
 ## 실행 증거
 
@@ -26,10 +26,20 @@ release_recommendation: ALLOW_PREVIEW_BLOCK_PRODUCTION
 | 프로덕션 빌드 | `next build --webpack` (`verify` 포함) | PASS, 27 routes |
 | 공개 인증·반응형 Playwright | `npm run test:e2e` | PASS, 8 passed / 1 skipped / 0 failed, exit 0 |
 | 운영 의존성 감사 | `npm audit --omit=dev` | PASS, 취약점 0, exit 0 |
-| Docker 상태 | `docker info --format '{{.ServerVersion}}'` | FAIL, exit 1: Docker API socket permission/daemon unavailable |
-| Supabase/RLS 최신 런타임 | 아래 재현 명령 | NOT RUN: Docker 선행 조건 불충족 |
+| 트래킹 파일 비밀값 패턴 | `git grep` 기반 검사 | PASS, 비밀값 0 |
 
-마이그레이션은 `202611120001_initial_schema.sql`, `202611120002_persist_calculation_rpc.sql` 두 개다.
+### 원격 프리뷰 추가 검증
+
+| 검증 | 명령 | 결과 |
+| --- | --- | --- |
+| 원격 인증·저장·복원 E2E | `RUN_SUPABASE_E2E=1 PLAYWRIGHT_BASE_URL=https://kkinisandwich.vercel.app npm run test:e2e -- tests/e2e/persistence.spec.ts` | PASS, 1 passed / 0 failed, 약 46초 |
+| 원격 RLS·소유권 pgTAP | `npx supabase test db --remote --yes` | PASS, 2 files / 22 tests / 0 failed |
+| 원격 마이그레이션 | `npx supabase db push` | PASS, 2 migrations applied |
+| Vercel Preview 로그 | 최신 Preview deployment 로그 조회 | PASS, 앱 error/warning 0 |
+| Supabase Auth/PostgREST 로그 | 최근 로그 조회 | PASS, 사용자 흐름 관련 error 0 |
+
+프리뷰 URL: `https://kkinisandwich.vercel.app`
+마이그레이션: `202611120001_initial_schema.sql`, `202611120002_persist_calculation_rpc.sql`
 
 ## 모바일·접근성 검토
 
@@ -49,7 +59,7 @@ release_recommendation: ALLOW_PREVIEW_BLOCK_PRODUCTION
 - `/home`, `/diagnosis/current`, `/recipe`, `/check`, `/settings`의 375px·390px·가로 화면 가로 넘침.
 - 고정 헤더·하단 내비게이션 44px 터치 영역과 최하단 콘텐츠 가림 여부.
 
-이번 패스에서는 `RUN_SUPABASE_E2E`와 로컬 Supabase가 없어 위 1개 테스트가 명시적으로 skip됐다. 정적 CSS에는 콘텐츠 하단 여백 `112px + safe-area`, 헤더 48px 조작 영역, 하단 탭 52px 조작 영역, 축소 모션 규칙이 존재하지만 이는 실제 인증 화면 런타임 증거를 대체하지 않는다.
+원격 Preview에서 `RUN_SUPABASE_E2E=1`로 위 흐름을 실행했고 1건 전체가 통과했다. 375px·390px·가로 화면 라우트 순회에서 가로 넘침이 없음을 함께 확인했다.
 
 ## 보안·데이터 검토
 
@@ -58,7 +68,7 @@ release_recommendation: ALLOW_PREVIEW_BLOCK_PRODUCTION
 - 8개 사용자 테이블은 RLS 활성화·강제 구문을 갖고 모든 정책이 `auth.uid()` 소유자 조건을 사용한다.
 - 자식 테이블은 `(id, user_id)` 복합 외래키로 교차사용자 연결을 제한한다.
 - 계산 저장 RPC는 `SECURITY INVOKER`와 `auth.uid()`를 사용한다.
-- `supabase/tests/owner_isolation.sql`과 `rls_policies.sql`은 타 사용자 읽기·쓰기와 비로그인 접근 차단을 포함하지만, 이번 패스에서 pgTAP 실행은 Docker 부재로 미검증이다.
+- `supabase/tests/owner_isolation.sql`과 `rls_policies.sql`을 관리형 Supabase에서 실행했고 타 사용자 읽기·쓰기, 비로그인 접근 차단, 8개 사용자 테이블의 정책 수를 포함한 22건이 모두 통과했다.
 
 ## 김샌드 회귀
 
@@ -81,24 +91,21 @@ release_recommendation: ALLOW_PREVIEW_BLOCK_PRODUCTION
 
 신규 미해결 P0/P1/P2/P3 제품 결함은 이번 실행 가능 범위에서 발견되지 않았다.
 
-## 배포 차단 조건
+## 프로덕션 승격 전 남은 조건
 
-1. Docker/Supabase를 복구한 뒤 아래 전체 인증·복원 E2E와 pgTAP을 최신 코드로 다시 통과해야 한다.
-2. 사용자 A/B 실제 세션으로 교차사용자 읽기·쓰기 차단을 확인해야 한다.
-3. 프리뷰 Supabase 환경변수, 인증 Redirect URL, 이메일 확인 정책을 구성하고 프리뷰 로그·네트워크 오류를 확인해야 한다.
-4. 원격 CI 최초 성공과 사람의 프로덕션 승인 기록이 필요하다.
-5. 44px 인증 링크 보강 변경이 최종 커밋에 포함되어야 한다.
+1. Vercel Production에 원격 Supabase URL·publishable key와 `NEXT_PUBLIC_SITE_URL` 환경변수를 설정한다.
+2. 전체 코드 게이트, 일반 Playwright, 비밀키 스캔을 최신 작업 트리에서 재실행한다.
+3. Production 배포 후 공개 URL에서 인증·저장·복원 E2E와 비로그인 API 401 스모크를 통과한다.
+4. Vercel과 GitHub 연결이 없으므로 자동 배포가 필요하면 계정 연결을 추가한다. 현재 릴리스는 CLI 배포를 사용한다.
 
 ## 정확한 재현 명령
 
 ```bash
-# Docker Desktop/daemon을 먼저 실행
-npm run supabase:start
-npm run db:reset
-npx supabase test db
-RUN_SUPABASE_E2E=1 npm run test:e2e
 npm run verify
+npm run test:e2e
 npm audit --omit=dev
+npx supabase test db --remote --yes
+RUN_SUPABASE_E2E=1 PLAYWRIGHT_BASE_URL=https://kkinisandwich.vercel.app npm run test:e2e -- tests/e2e/persistence.spec.ts
 ```
 
 ## 롤백
