@@ -1,4 +1,31 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function expectProductLayout(page: Page) {
+  const sizes = await page.evaluate(() => ({
+    viewport: window.innerWidth,
+    document: document.documentElement.scrollWidth,
+    header: document.querySelector(".app-header")?.getBoundingClientRect(),
+    nav: document.querySelector(".bottom-nav")?.getBoundingClientRect(),
+  }));
+  expect(sizes.document).toBeLessThanOrEqual(sizes.viewport);
+  expect(sizes.header?.top).toBeGreaterThanOrEqual(0);
+  expect(sizes.nav?.bottom).toBeLessThanOrEqual(await page.evaluate(() => window.innerHeight));
+
+  const shellTargets = page.locator(".app-header button, .app-header a, .bottom-nav a");
+  for (let index = 0; index < (await shellTargets.count()); index += 1) {
+    const box = await shellTargets.nth(index).boundingBox();
+    expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+  }
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  const overlap = await page.evaluate(() => {
+    const nav = document.querySelector(".bottom-nav")?.getBoundingClientRect();
+    const lastContent = document.querySelector(".app-content")?.lastElementChild?.getBoundingClientRect();
+    return nav && lastContent ? lastContent.bottom > nav.top : false;
+  });
+  expect(overlap).toBe(false);
+}
 
 test.describe("authenticated persistence", () => {
   test.skip(!process.env.RUN_SUPABASE_E2E, "requires the local Supabase stack");
@@ -49,5 +76,17 @@ test.describe("authenticated persistence", () => {
     await expect(page.getByText("이번 달 돈의 흐름")).toBeVisible();
     await page.goto("/check");
     await expect(page.getByRole("checkbox", { name: /생활비 10% 조정/ })).toBeChecked();
+
+    for (const viewport of [
+      { width: 375, height: 812 },
+      { width: 390, height: 844 },
+      { width: 844, height: 390 },
+    ]) {
+      await page.setViewportSize(viewport);
+      for (const route of ["/home", "/diagnosis/current", "/recipe", "/check", "/settings"]) {
+        await page.goto(route);
+        await expectProductLayout(page);
+      }
+    }
   });
 });
