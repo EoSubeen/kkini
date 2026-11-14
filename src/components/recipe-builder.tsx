@@ -295,18 +295,18 @@ export function RecipeBuilder({
 
       <div className="builder-stage" aria-label={`현재 ${selectedIngredients.length}개 재료로 조립한 샌드위치`}>
         <span className="builder-stage__badge">조립 중</span>
-        <Image className="builder-stage__plate" src="/kkini/plate.png" alt="" width={430} height={145} />
+        <span className="builder-stage__plate">
+          <Image src="/kkini/plate.png" alt="" fill sizes="(max-width: 540px) 96vw, 430px" loading="eager" />
+        </span>
         <div className="builder-layers">
           {selectedIngredients.map((item, index) => (
-            <Image
+            <span
               className="builder-layer"
               style={{ "--layer-bottom": `${index * 14}px` } as React.CSSProperties}
               key={`${item.id}-${index}`}
-              src={item.image}
-              alt={item.name}
-              width={380}
-              height={138}
-            />
+            >
+              <Image src={item.image} alt={item.name} fill sizes="(max-width: 540px) 88vw, 390px" loading="eager" />
+            </span>
           ))}
         </div>
       </div>
@@ -338,7 +338,7 @@ export function RecipeBuilder({
               : recommended.includes(item.id) ? "추천" : item.recipes.length === 0 && category.id !== "bread" && category.id !== "main" ? "계산 제외" : null;
             return (
               <button className="ingredient-card" type="button" key={item.id} data-selected={isSelected} aria-pressed={isSelected} onClick={() => toggleIngredient(item.id)}>
-                <Image src={item.image} alt="" width={150} height={92} />
+                <span className="ingredient-card__image"><Image src={item.image} alt="" fill sizes="(max-width: 374px) 42vw, 230px" loading="eager" /></span>
                 <div><strong>{item.name}</strong><span>{item.meaning}</span></div>
                 {isSelected ? <span className="ingredient-card__check"><Check size={18} aria-hidden="true" /> 선택됨</span> : tag ? <span className="report-card__tag">{tag}</span> : null}
               </button>

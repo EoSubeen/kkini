@@ -27,14 +27,14 @@ export default async function SettingsPage() {
         <Card className="settings-list">
           <Link href="/onboarding"><span><UserRound size={19} aria-hidden="true" style={{ verticalAlign: -4, marginRight: 10 }} />재무 정보 수정</span><ChevronRight size={19} aria-hidden="true" /></Link>
           <Link href="/diagnosis/current"><span><FileText size={19} aria-hidden="true" style={{ verticalAlign: -4, marginRight: 10 }} />최근 진단 결과</span><ChevronRight size={19} aria-hidden="true" /></Link>
-          <button type="button"><span><LockKeyhole size={19} aria-hidden="true" style={{ verticalAlign: -4, marginRight: 10 }} />개인정보와 보안</span><ChevronRight size={19} aria-hidden="true" /></button>
+          <Link href="/settings/privacy"><span><LockKeyhole size={19} aria-hidden="true" style={{ verticalAlign: -4, marginRight: 10 }} />개인정보와 보안</span><ChevronRight size={19} aria-hidden="true" /></Link>
         </Card>
       </section>
       <section className="section-stack">
         <SectionHeading title="서비스" />
         <Card className="settings-list">
-          <button type="button"><span>계산 기준일</span><span style={{ color: "var(--kkini-muted)" }}>2026.11</span></button>
-          <button type="button"><span>앱 버전</span><span style={{ color: "var(--kkini-muted)" }}>0.1.0</span></button>
+          <div className="settings-list__row"><span>계산 기준일</span><span style={{ color: "var(--kkini-muted)" }}>2026.11</span></div>
+          <div className="settings-list__row"><span>앱 버전</span><span style={{ color: "var(--kkini-muted)" }}>0.1.0</span></div>
           <form action={signOutAction}>
             <button type="submit"><span><LogOut size={19} aria-hidden="true" style={{ verticalAlign: -4, marginRight: 10 }} />로그아웃</span><ChevronRight size={19} aria-hidden="true" /></button>
           </form>

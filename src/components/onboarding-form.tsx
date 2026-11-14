@@ -57,7 +57,7 @@ function Field({
         inputMode={name === "displayName" ? undefined : "decimal"}
         min={name === "displayName" ? undefined : min}
         max={max}
-        step={name.includes("Rate") || name.includes("Reduction") ? "0.1" : "1"}
+        step={name === "age" || name.endsWith("Age") || name.includes("Years") || name === "siblingCountIncludingSelf" ? "1" : "any"}
         defaultValue={defaultValue}
         required={required}
       />
@@ -348,7 +348,16 @@ export function OnboardingForm({
       <div className="button-row">
         <button className="button-secondary" type="button" disabled={step === 0 || pending} onClick={() => setStep((value) => Math.max(0, value - 1))}>이전</button>
         {step < steps.length - 1 ? (
-          <button className="button" type="button" onClick={() => setStep((value) => Math.min(steps.length - 1, value + 1))}>다음</button>
+          <button
+            className="button"
+            type="button"
+            onClick={(event) => {
+              event.preventDefault();
+              setStep((value) => Math.min(steps.length - 1, value + 1));
+            }}
+          >
+            다음
+          </button>
         ) : (
           <button className="button" type="submit" disabled={pending} aria-busy={pending}>{pending ? "진단 중…" : "입력 끝내고 결과 보기"}</button>
         )}

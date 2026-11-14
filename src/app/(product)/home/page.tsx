@@ -68,7 +68,9 @@ export default async function HomePage() {
           <strong>{cashFlowLabel}</strong>
           <small>{deficit ? "지출과 가족 목표가 겹쳐 조금 빠듯해요." : "현재 흑자를 목표별로 나눠 담을 수 있어요."}</small>
         </div>
-        <Image className="hero-card__image" src="/kkini/balanced-sandwich.png" alt="균형 있게 쌓인 끼니 샌드위치" width={215} height={190} priority />
+        <span className="hero-card__image">
+          <Image src="/kkini/balanced-sandwich.png" alt="균형 있게 쌓인 끼니 샌드위치" fill sizes="(max-width: 374px) 190px, 215px" loading="eager" />
+        </span>
       </Card>
 
       <Card tone="warm" className="section-stack">
