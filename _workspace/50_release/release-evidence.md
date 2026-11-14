@@ -1,19 +1,19 @@
 # 끼니 QA·Release evidence
 
 ```yaml
-status: READY_FOR_PRODUCTION_PROMOTION
+status: PRODUCTION_RELEASED
 producer: qa-release
 consumer: architecture-supervisor
-target_ref: main@ce779ee plus this QA patch
+target_ref: main@43d82ce plus this evidence update
 verified_at: 2026-11-15 Asia/Seoul
-release_recommendation: ALLOW_PRODUCTION_AFTER_ENV_CONFIGURATION
+release_recommendation: RELEASE_ACCEPTED
 ```
 
 ## 결론
 
-커밋 `ce779ee` 기준 코드를 Vercel Preview와 관리형 Supabase 프로젝트에 연결했다. 회원가입→6단계 입력→진단→점검 저장→로그아웃→재로그인→진단·점검 복원 E2E가 실제 원격 DB에서 통과했다. 인증 사용자 A/B 격리와 전체 RLS 정책을 검사하는 pgTAP 22건도 원격 DB에서 통과했다.
+커밋 `43d82ce` 기준 코드를 Vercel Production과 관리형 Supabase 프로젝트에 연결했다. 회원가입→6단계 입력→진단→점검 저장→로그아웃→재로그인→진단·점검 복원 E2E가 실제 원격 DB에서 통과했다. 인증 사용자 A/B 격리와 전체 RLS 정책을 검사하는 pgTAP 22건도 원격 DB에서 통과했다.
 
-프리뷰 로그에서 애플리케이션 오류·경고, Supabase Auth 오류, PostgREST 오류는 확인되지 않았다. 업데이트된 코드 게이트를 다시 통과하고 동일한 환경변수를 Vercel Production에 설정한 뒤 공개 URL에서 스모크 테스트를 통과하면 프로덕션 승격이 가능하다.
+프리뷰 로그에서 애플리케이션 오류·경고, Supabase Auth 오류, PostgREST 오류는 확인되지 않았다. 동일한 Supabase 공개 환경값을 Vercel Production에 설정하고 `kkinisandwich.vercel.app`을 프로덕션 배포에 연결했다. Vercel Authentication은 `preview` 범위로 제한해 Preview는 보호하고 Production은 공개했다. 공개 URL에서 비로그인 API 401과 전체 인증·저장·복원 E2E가 통과했다.
 
 ## 실행 증거
 
@@ -37,8 +37,11 @@ release_recommendation: ALLOW_PRODUCTION_AFTER_ENV_CONFIGURATION
 | 원격 마이그레이션 | `npx supabase db push` | PASS, 2 migrations applied |
 | Vercel Preview 로그 | 최신 Preview deployment 로그 조회 | PASS, 앱 error/warning 0 |
 | Supabase Auth/PostgREST 로그 | 최근 로그 조회 | PASS, 사용자 흐름 관련 error 0 |
+| Production 공개 스모크 | `curl`로 `/`, `/login`, `/api/profile/latest` 확인 | PASS, 200 / 200 / 401 |
+| Production 인증·저장·복원 E2E | `RUN_SUPABASE_E2E=1 PLAYWRIGHT_BASE_URL=https://kkinisandwich.vercel.app npm run test:e2e -- tests/e2e/persistence.spec.ts` | PASS, 1 passed / 0 failed, 52.4초 |
 
-프리뷰 URL: `https://kkinisandwich.vercel.app`
+프로덕션 URL: `https://kkinisandwich.vercel.app`
+프로덕션 deployment: `dpl_4tq9J7gRVXUZ6AEA3PqxZGQNhtuD`
 마이그레이션: `202611120001_initial_schema.sql`, `202611120002_persist_calculation_rpc.sql`
 
 ## 모바일·접근성 검토
@@ -91,12 +94,17 @@ release_recommendation: ALLOW_PRODUCTION_AFTER_ENV_CONFIGURATION
 
 신규 미해결 P0/P1/P2/P3 제품 결함은 이번 실행 가능 범위에서 발견되지 않았다.
 
-## 프로덕션 승격 전 남은 조건
+### RESOLVED · 배포 별칭 전환 직후 Server Action 재인증
 
-1. Vercel Production에 원격 Supabase URL·publishable key와 `NEXT_PUBLIC_SITE_URL` 환경변수를 설정한다.
-2. 전체 코드 게이트, 일반 Playwright, 비밀키 스캔을 최신 작업 트리에서 재실행한다.
-3. Production 배포 후 공개 URL에서 인증·저장·복원 E2E와 비로그인 API 401 스모크를 통과한다.
-4. Vercel과 GitHub 연결이 없으므로 자동 배포가 필요하면 계정 연결을 추가한다. 현재 릴리스는 CLI 배포를 사용한다.
+- 최초 Production E2E에서 로그아웃 후 재로그인 시 Next.js 오류 페이지가 1회 표시됐다.
+- Vercel 요청·함수 로그에 동일 시점의 4xx/5xx 애플리케이션 오류는 없었다.
+- Preview 배포에서 Production 배포로 도메인 별칭을 전환한 직후의 일시적 엣지 상태로 판단했다.
+- 별칭 전파 후 동일 새 계정 전체 E2E를 재실행해 1 passed / 0 failed를 확인했다.
+
+## 운영 메모
+
+1. Vercel과 GitHub 연결이 없으므로 현재 릴리스는 CLI 배포를 사용한다. 자동 배포가 필요하면 Vercel 계정에 GitHub login connection을 추가한다.
+2. Supabase 시스템 로그의 `realtime.subscription` exporter 경고는 제품 요청과 무관한 관리형 플랫폼 지표 수집 잡음으로 분류했다.
 
 ## 정확한 재현 명령
 
