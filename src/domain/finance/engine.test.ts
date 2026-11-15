@@ -88,6 +88,16 @@ describe("calculateFinance", () => {
     expect(mc.guardrail.p).toBe(1);
   });
 
+  it("sizes term insurance from the current-state gap like report table 8 (약 2.0억, 월 12만 원)", () => {
+    const recommended = calculateFinance(kimSandProfile, {
+      selectedRecipeIds: ["basic", "ins", "par", "term", "reemp", "hp", "retm", "npcont"],
+      housing: { downsizingRatio: 0.7, downsizingAge: null, reverseMortgageEnabled: false },
+    }, { now: fixedNow });
+    expect(recommended.monthlyCashFlow).toBeCloseTo(-12, 0);
+    expect(recommended.depletionAge).toBeNull();
+    expect(recommended.assetsAt95 / 10_000).toBeCloseTo(3.2, 1);
+  });
+
   it("exposes the fixed submitted-report case separately from user calculations", () => {
     expect(REPORT_RECOMMENDATION_CASE.sourceLabel).toBe("제출 보고서의 고정 사례");
     expect(REPORT_RECOMMENDATION_CASE.monthlyCashFlow).toBe(-12);
