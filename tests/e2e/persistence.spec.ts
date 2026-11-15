@@ -52,6 +52,9 @@ test.describe("authenticated persistence", () => {
     await page.getByRole("button", { name: /목표로 계속하기/ }).click();
     await expect(page).toHaveURL(/\/onboarding$/);
 
+    await page.getByRole("button", { name: "다음" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "가족" })).toBeVisible();
+    await expect(page.getByRole("alert").filter({ hasText: "필수 입력을 확인해 주세요" })).toBeVisible();
     await page.getByLabel(/내 나이/).fill("50");
     await page.getByRole("button", { name: "다음" }).click();
     await page.getByLabel("월 세후소득 (만 원)", { exact: true }).fill("600");
@@ -91,6 +94,53 @@ test.describe("authenticated persistence", () => {
     await expect(page.getByText("이번 달 돈의 흐름")).toBeVisible();
     await page.goto("/check");
     await expect(page.getByRole("checkbox", { name: /생활비 10% 조정/ })).toBeChecked();
+
+    const primaryNav = page.getByRole("navigation", { name: "주요 메뉴" });
+    for (const item of [
+      { name: "홈", path: "/home" },
+      { name: "진단", path: "/diagnosis/current" },
+      { name: "레시피", path: "/recipe" },
+      { name: "점검", path: "/check" },
+      { name: "설정", path: "/settings" },
+    ]) {
+      await primaryNav.getByRole("link", { name: item.name, exact: true }).click();
+      await expect(page).toHaveURL(new RegExp(`${item.path.replace("/", "\\/")}$`));
+    }
+
+    for (const item of [
+      { name: "현재 진단", path: "/diagnosis/current" },
+      { name: "미래 타임라인", path: "/diagnosis/timeline" },
+      { name: "가족 안전망", path: "/diagnosis/family" },
+    ]) {
+      await page.goto("/diagnosis/current");
+      await page.getByRole("navigation", { name: "화면 보기" }).getByRole("link", { name: item.name }).click();
+      await expect(page).toHaveURL(new RegExp(`${item.path.replaceAll("/", "\\/")}$`));
+    }
+
+    for (const item of [
+      { name: "추천 조합", path: "/recipe" },
+      { name: "분야별 대안", path: "/recipe/alternatives" },
+      { name: "실행 계획", path: "/recipe/plan" },
+    ]) {
+      await page.goto("/recipe");
+      await page.getByRole("navigation", { name: "화면 보기" }).getByRole("link", { name: item.name }).click();
+      await expect(page).toHaveURL(new RegExp(`${item.path.replaceAll("/", "\\/")}$`));
+    }
+
+    for (const item of [
+      { name: "충격 테스트", path: "/check/shock" },
+      { name: "계획 추적", path: "/check" },
+      { name: "근거·리포트", path: "/check/report" },
+    ]) {
+      await page.goto("/check");
+      await page.getByRole("navigation", { name: "화면 보기" }).getByRole("link", { name: item.name }).click();
+      await expect(page).toHaveURL(new RegExp(`${item.path.replaceAll("/", "\\/")}$`));
+    }
+
+    await page.goto("/settings");
+    await page.getByRole("link", { name: /개인정보와 보안/ }).click();
+    await expect(page).toHaveURL(/\/settings\/privacy$/);
+    await expect(page.getByRole("heading", { name: "개인정보와 보안" })).toBeVisible();
 
     for (const viewport of [
       { width: 375, height: 812 },

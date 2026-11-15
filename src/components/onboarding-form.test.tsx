@@ -3,16 +3,28 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { kimSandProfile } from "@/domain/finance";
 import { OnboardingForm } from "./onboarding-form";
 
+const replace = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }),
+  useRouter: () => ({ replace, prefetch: vi.fn() }),
 }));
 
 afterEach(() => {
   cleanup();
+  replace.mockClear();
   vi.unstubAllGlobals();
 });
 
 describe("OnboardingForm", () => {
+  it("keeps the user on a step and explains which required input is missing", async () => {
+    render(<OnboardingForm defaultName="QA샌드" setupMode />);
+
+    fireEvent.click(screen.getByRole("button", { name: "다음" }));
+
+    expect(screen.getByRole("heading", { level: 1, name: "가족" })).toBeVisible();
+    expect(screen.getByRole("alert")).toHaveTextContent("가족 단계의 필수 입력을 확인해 주세요.");
+    await waitFor(() => expect(screen.getByLabelText("내 나이 (세)")).toHaveFocus());
+  });
+
   it("restores saved education and retirement expense values while editing", () => {
     render(
       <OnboardingForm
@@ -52,5 +64,23 @@ describe("OnboardingForm", () => {
     const request = fetchMock.mock.calls[0][1] as RequestInit;
     const payload = JSON.parse(String(request.body));
     expect(payload.profile).toEqual(kimSandProfile);
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/diagnosis/current"));
+  });
+
+  it("shows a recoverable error instead of appearing frozen when saving fails", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: { message: "저장에 실패했어요." } }),
+    }));
+    render(<OnboardingForm initialProfile={kimSandProfile} />);
+
+    for (let index = 0; index < 5; index += 1) {
+      fireEvent.click(screen.getByRole("button", { name: "다음" }));
+    }
+    fireEvent.click(screen.getByRole("button", { name: "입력 끝내고 결과 보기" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("저장에 실패했어요.");
+    expect(screen.getByRole("button", { name: "입력 끝내고 결과 보기" })).toBeEnabled();
+    expect(replace).not.toHaveBeenCalled();
   });
 });

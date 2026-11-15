@@ -344,7 +344,7 @@ a { color: inherit; text-decoration: none; }
 .builder-layer img { object-fit: contain; transform-origin: center bottom; }
 .builder-layer--bread img { transform-origin: center bottom; }
 /* 빵 PNG마다 다른 투명 캔버스 여백을 보정해 실제 보이는 폭을 약 230px로 통일한다. */
-.builder-layer--milk img { transform: scale(1.42); }
+.builder-layer--milk img { transform: translateY(36px) scale(1.42); }
 .builder-layer--wheat img, .builder-layer--rye img { transform: scale(0.96); }
 .builder-layer--baguette img { transform: scale(0.72); }
 .builder-stage__badge { position: absolute; z-index: 3; top: 16px; left: 16px; padding: 7px 11px; border-radius: 999px; color: var(--kkini-green-800); background: #fff; font-size: 12px; font-weight: 750; }

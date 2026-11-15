@@ -76,4 +76,14 @@ describe("RecipeBuilder", () => {
     expect(screen.getByAltText("바게트").parentElement).toHaveClass("builder-layer--bread", "builder-layer--baguette");
     expect(screen.getByRole("button", { name: "실행 계획 보기" })).toBeVisible();
   });
+
+  it("marks milk bread separately so its transparent canvas can be baseline-corrected", () => {
+    render(<RecipeBuilder />);
+    fireEvent.click(screen.getByRole("button", { name: /우유식빵/ }));
+
+    expect(screen.getByAltText("우유식빵").parentElement).toHaveClass(
+      "builder-layer--bread",
+      "builder-layer--milk",
+    );
+  });
 });

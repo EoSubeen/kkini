@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import type { FinancialProfile } from "@/lib/contracts";
 import { Card, PageIntro, ProgressBar, SectionHeading } from "./ui";
 
@@ -13,6 +13,14 @@ const steps = [
   ["보험·상속", "모르는 항목은 비워도 괜찮아요."],
   ["복지 확인", "받을 수 있는 제도를 찾는 선택 정보예요."],
 ] as const;
+
+type FormControl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+function findInvalidControl(form: HTMLFormElement, targetStep: number) {
+  const fieldset = form.querySelector<HTMLFieldSetElement>(`fieldset[data-form-step="${targetStep}"]`);
+  return Array.from(fieldset?.querySelectorAll<FormControl>("input, select, textarea") ?? [])
+    .find((control) => !control.checkValidity());
+}
 
 function number(formData: FormData, key: string, fallback = 0) {
   const value = formData.get(key);
@@ -149,15 +157,40 @@ export function OnboardingForm({
   /** 저장값이 있으면 저장값, 없으면 원래 기본값 */
   const dv = (key: string, fallback?: number | string) => (has(key) ? saved[key] : fallback);
   const router = useRouter();
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const [step, setStep] = useState(0);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => { router.prefetch("/diagnosis/current"); }, [router]);
 
+  function showError(message: string) {
+    setError(message);
+    window.requestAnimationFrame(() => {
+      errorRef.current?.focus();
+      errorRef.current?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+    });
+  }
+
+  function validateStep(form: HTMLFormElement, targetStep: number) {
+    const invalid = findInvalidControl(form, targetStep);
+    if (!invalid) return true;
+
+    setStep(targetStep);
+    showError(`${steps[targetStep][0]} 단계의 필수 입력을 확인해 주세요.`);
+    window.requestAnimationFrame(() => {
+      invalid.focus();
+      invalid.reportValidity();
+    });
+    return false;
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    for (let targetStep = 0; targetStep < steps.length; targetStep += 1) {
+      if (!validateStep(event.currentTarget, targetStep)) return;
+    }
     setPending(true);
     const formData = new FormData(event.currentTarget);
     const childrenAges = ["child1Age", "child2Age", "child3Age"]
@@ -224,26 +257,36 @@ export function OnboardingForm({
       ),
     };
 
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 20_000);
     try {
       const response = await fetch("/api/calculate", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ profile, persist: true }),
+        signal: controller.signal,
       });
-      const payload = await response.json();
+      const payload = await response.json().catch(() => null);
       if (!response.ok) {
         throw new Error(payload?.error?.message ?? "입력 정보를 저장하지 못했어요.");
       }
-      router.push("/diagnosis/current");
-      router.refresh();
+      router.replace("/diagnosis/current");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "잠시 후 다시 시도해 주세요.");
+      showError(
+        caught instanceof DOMException && caught.name === "AbortError"
+          ? "저장 시간이 오래 걸리고 있어요. 네트워크를 확인한 뒤 다시 시도해 주세요."
+          : caught instanceof Error
+            ? caught.message
+            : "잠시 후 다시 시도해 주세요.",
+      );
       setPending(false);
+    } finally {
+      window.clearTimeout(timeout);
     }
   }
 
   return (
-    <form className="page-stack" onSubmit={submit}>
+    <form className="page-stack" onSubmit={submit} noValidate>
       <PageIntro
         eyebrow={`${setupMode ? "3 / 3 · 정보 입력" : "재무 정보 수정"} · ${step + 1} / ${steps.length}`}
         title={steps[step][0]}
@@ -254,8 +297,10 @@ export function OnboardingForm({
         label="재무 정보 입력 진행률"
       />
 
+      {error ? <p className="notice notice--warn" role="alert" tabIndex={-1} ref={errorRef}>{error}</p> : null}
+
       <Card className="section-stack">
-        <fieldset hidden={step !== 0} style={{ border: 0, padding: 0, margin: 0 }}>
+        <fieldset data-form-step="0" hidden={step !== 0} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="우리 가족" description="필수 항목은 이름과 내 나이예요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
             <Field name="displayName" label="부를 이름" defaultValue={dv("displayName", defaultName) as string} required />
@@ -272,7 +317,7 @@ export function OnboardingForm({
           </div>
         </fieldset>
 
-        <fieldset hidden={step !== 1} style={{ border: 0, padding: 0, margin: 0 }}>
+        <fieldset data-form-step="1" hidden={step !== 1} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="버는 돈" description="금액 단위는 만 원이에요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
             <Field name="monthlyNetIncome" defaultValue={dv("monthlyNetIncome")} label="월 세후소득" unit="만 원" required />
@@ -288,7 +333,7 @@ export function OnboardingForm({
           </div>
         </fieldset>
 
-        <fieldset hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0 }}>
+        <fieldset data-form-step="2" hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="쓰는 돈" description="대출 원리금은 자산·빚 단계에서 계산해요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
             <Field name="monthlyLivingExpense" defaultValue={dv("monthlyLivingExpense")} label="월 생활비" unit="만 원" required />
@@ -305,7 +350,7 @@ export function OnboardingForm({
           </div>
         </fieldset>
 
-        <fieldset hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0 }}>
+        <fieldset data-form-step="3" hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="가진 것과 빚" description="금액 단위는 만 원이에요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
             <Field name="deposits" defaultValue={dv("deposits")} label="예금·적금" unit="만 원" required />
@@ -322,7 +367,7 @@ export function OnboardingForm({
           </div>
         </fieldset>
 
-        <fieldset hidden={step !== 4} style={{ border: 0, padding: 0, margin: 0 }}>
+        <fieldset data-form-step="4" hidden={step !== 4} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="보험·상속" description="선택 정보이며 모르면 비워도 돼요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
             <Field name="deathBenefit" defaultValue={dv("deathBenefit")} label="사망보험금" unit="만 원" />
@@ -338,7 +383,7 @@ export function OnboardingForm({
           </div>
         </fieldset>
 
-        <fieldset hidden={step !== 5} style={{ border: 0, padding: 0, margin: 0 }}>
+        <fieldset data-form-step="5" hidden={step !== 5} style={{ border: 0, padding: 0, margin: 0 }}>
           <SectionHeading title="복지 확인용" description="복지 가능성을 대략 가늠하는 데만 사용해요." />
           <div className="section-stack" style={{ marginTop: 16 }}>
             <Field name="parentsMonthlyRecognizedIncome" defaultValue={dv("parentsMonthlyRecognizedIncome")} label="부모님 월 소득인정액" unit="만 원" />
@@ -348,7 +393,6 @@ export function OnboardingForm({
         </fieldset>
       </Card>
 
-      {error ? <p className="notice notice--warn" role="alert">{error}</p> : null}
       <div className="button-row">
         <button className="button-secondary" type="button" disabled={step === 0 || pending} onClick={() => setStep((value) => Math.max(0, value - 1))}>이전</button>
         {step < steps.length - 1 ? (
@@ -357,7 +401,11 @@ export function OnboardingForm({
             type="button"
             onClick={(event) => {
               event.preventDefault();
-              setStep((value) => Math.min(steps.length - 1, value + 1));
+              const form = event.currentTarget.form;
+              if (form && validateStep(form, step)) {
+                setError("");
+                setStep((value) => Math.min(steps.length - 1, value + 1));
+              }
             }}
           >
             다음
