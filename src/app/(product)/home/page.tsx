@@ -32,7 +32,7 @@ export default async function HomePage() {
   if (!latest.profile) {
     return (
       <div className="page-stack">
-        <PageIntro eyebrow={`안녕하세요, ${displayName} 님`} title="첫 재무 진단을 시작할까요?" description="우리 집 숫자를 너ᄒ으면 월수지와 맞춤 레시피를 만들어요." />
+        <PageIntro eyebrow={`안녕하세요, ${displayName} 님`} title="첫 재무 진단을 시작할까요?" description="우리 집 숫자를 넣으면 월수지와 맞춤 레시피를 만들어요." />
         <Card tone="green" className="section-stack">
           <SectionHeading title="약 5분이면 충분해요" description="모르는 항목은 비워 두어도 기본 가정으로 계산해요." />
           <Link className="button" href="/onboarding">내 정보 입력하기 <ArrowRight size={18} aria-hidden="true" /></Link>
@@ -62,7 +62,7 @@ export default async function HomePage() {
           <small>{deficit ? "지출과 가족 목표가 겹쳐 조금 빠듯해요." : "현재 흑자를 목표별로 나눠 담을 수 있어요."}</small>
         </div>
         <span className="home-balance__image">
-          <Image src="/kkini/balanced-sandwich.png" alt="균형 있게 싸힌 끼니 샌드위치" fill sizes="(max-width: 374px) 190px, 220px" loading="eager" />
+          <Image src="/kkini/balanced-sandwich.png" alt="균형 있게 쌓인 끼니 샌드위치" fill sizes="(max-width: 374px) 190px, 220px" loading="eager" />
         </span>
       </section>
 
@@ -87,7 +87,7 @@ export default async function HomePage() {
           </Link>
           <Link className="home-action-row" href="/check">
             <span className="home-action-row__art"><Image src="/kkini/actions/checklist.png" alt="" fill sizes="72px" /></span>
-            <div><strong>이번 달 실행 체크</strong><p>끄ᄐ낸 일을 하나씩 완료해요.</p></div>
+            <div><strong>이번 달 실행 체크</strong><p>끝낸 일을 하나씩 완료해요.</p></div>
             <ArrowRight size={20} aria-hidden="true" />
           </Link>
         </div>
@@ -99,7 +99,7 @@ export default async function HomePage() {
         <p>{total > 0 ? `${completed}개 완료 · ${total - completed}개 남음` : "점검 탭에서 첫 실행 계획을 체크해 보세요."}</p>
       </section>
 
-      <p className="service-footnote">끼니의 결과는 교육·모의설계용 추정치에요. 실제 금융 결정 전에는 공식 기관 조회와 전문가 상담을 거치세요.</p>
+      <p className="service-footnote">끼니의 결과는 교육·모의설계용 추정치예요. 실제 금융 결정 전에는 공식 기관 조회와 전문가 상담을 거치세요.</p>
     </div>
   );
 }

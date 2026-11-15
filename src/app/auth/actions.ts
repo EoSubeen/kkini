@@ -36,14 +36,14 @@ export async function signUpAction(
     password,
     options: {
       data: { display_name: displayName },
-      emailRedirectTo: `${siteUrl.replace(/\/$/, "")}/auth/callback?next=/onboarding`,
+      emailRedirectTo: `${siteUrl.replace(/\/$/, "")}/auth/callback?next=/consultation/consent`,
     },
   });
 
   if (error) return { error: "가입을 완료하지 못했어요. 이메일과 비밀번호를 다시 확인해 주세요." };
 
   revalidatePath("/", "layout");
-  if (data.session) redirect("/onboarding");
+  if (data.session) redirect("/consultation/consent");
   redirect("/login?notice=이메일에서 가입 확인 링크를 눌러 주세요.");
 }
 

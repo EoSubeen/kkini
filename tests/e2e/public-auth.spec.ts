@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
 
+test("site entry shows the branded splash before login", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "끼니" })).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/, { timeout: 5_000 });
+});
+
 test("login and signup expose accessible account forms on mobile", async ({ page }) => {
   await page.goto("/login");
 

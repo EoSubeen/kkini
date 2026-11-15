@@ -1,7 +1,6 @@
-import { redirect } from "next/navigation";
-
-export const instant = false;
+import { SplashScreen } from "@/components/splash-screen";
+import "@/styles/kkini.css";
 
 export default function RootPage() {
-  redirect("/home");
+  return <SplashScreen />;
 }

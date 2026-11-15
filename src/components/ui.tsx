@@ -104,6 +104,7 @@ export function SegmentTabs({
         <Link
           key={item.href}
           href={item.href}
+          prefetch
           data-active={item.href === current}
           aria-current={item.href === current ? "page" : undefined}
         >

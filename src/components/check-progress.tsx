@@ -6,10 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, checkTabs, PageIntro, ProgressBar, SectionHeading, SegmentTabs } from "./ui";
 
 const initialItems = [
-  { id: "expense", title: "생활비 10% 조정", description: "고정비와 구독 서비스부터 화긴" },
-  { id: "insurance", title: "보험 구조 정리", description: "중복 특약과 실손 세대 화긴" },
-  { id: "pension", title: "연금 계좌 화긴", description: "IRP·연금저축 납입액 점검" },
-  { id: "welfare", title: "받을 수 있는 제도 신청", description: "기초연금·장학금 가능성 화긴" },
+  { id: "expense", title: "생활비 10% 조정", description: "고정비와 구독 서비스부터 확인" },
+  { id: "insurance", title: "보험 구조 정리", description: "중복 특약과 실손 세대 확인" },
+  { id: "pension", title: "연금 계좌 확인", description: "IRP·연금저축 납입액 점검" },
+  { id: "welfare", title: "받을 수 있는 제도 신청", description: "기초연금·장학금 가능성 확인" },
 ];
 
 export function CheckProgress({ plannedAssets = [] }: { plannedAssets?: number[] }) {
@@ -59,7 +59,7 @@ export function CheckProgress({ plannedAssets = [] }: { plannedAssets?: number[]
     const actual = Number(actualAssets);
     const plan = plannedAssets[elapsed - 1];
     if (!actualAssets.trim() || !Number.isFinite(actual)) {
-      setReview("지금 실제 금융자산(예금·투자에서 마이너스통을 뺀 금액)을 만 원 단위로 너ᄒ어 주세요.");
+      setReview("지금 실제 금융자산(예금·투자에서 마이너스통장을 뺀 금액)을 만 원 단위로 넣어 주세요.");
       return;
     }
     if (plan === undefined) {
@@ -84,7 +84,7 @@ export function CheckProgress({ plannedAssets = [] }: { plannedAssets?: number[]
   return (
     <div className="page-stack check-page">
       <SegmentTabs items={checkTabs} current="/check" />
-      <PageIntro title="이번 달, 얼마나 실행했나요?" description="끄ᄐ낸 일을 하나씩 표시하고, 이번 달 계획을 저장해요." />
+      <PageIntro title="이번 달, 얼마나 실행했나요?" description="끝낸 일을 하나씩 표시하고, 이번 달 계획을 저장해요." />
 
       <section className="check-progress-hero" aria-labelledby="progress-heading">
         <div className="check-progress-hero__copy">
@@ -97,7 +97,7 @@ export function CheckProgress({ plannedAssets = [] }: { plannedAssets?: number[]
       </section>
 
       <section className="section-stack">
-        <SectionHeading title="이번 달 체크리스트" description="끄ᄐ난 일은 바로 표시해요." />
+        <SectionHeading title="이번 달 체크리스트" description="끝낸 일은 바로 표시해요." />
         <div className="checklist">
           {initialItems.map((item) => {
             const checked = done.has(item.id);
@@ -115,7 +115,7 @@ export function CheckProgress({ plannedAssets = [] }: { plannedAssets?: number[]
       {error ? <p className="notice notice--warn" role="alert">{error}</p> : null}
 
       <Card className="section-stack check-compare">
-        <SectionHeading title="계획과 지금을 비교해요" description="예상을 너ᄒ으면 차이를 바로 보여드릴게요." />
+        <SectionHeading title="계획과 지금을 비교해요" description="예상을 넣으면 차이를 바로 보여드릴게요." />
         <div className="form-field"><label htmlFor="elapsed">설계 후 지난 기간</label><select id="elapsed" value={elapsed} onChange={(event) => setElapsed(Number(event.target.value))}><option value={1}>1년</option><option value={2}>2년</option><option value={3}>3년</option></select></div>
         <div className="form-field"><label htmlFor="actualAssets">지금 실제 금융자산</label><input id="actualAssets" inputMode="numeric" placeholder="만 원 단위" value={actualAssets} onChange={(event) => setActualAssets(event.target.value)} /></div>
         <button className="button" type="button" onClick={compare}>계획과 비교하기</button>

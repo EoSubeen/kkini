@@ -25,12 +25,15 @@ export function AuthForm({
   return (
     <>
       <div className="auth-brand">
-        <Image src="/kkini/logo-horizontal.png" alt="끼니" width={112} height={38} priority />
+        <div className="auth-brand__lockup" aria-label="끼니">
+          <Image src="/kkini/logo-symbol.png" alt="" width={54} height={50} priority />
+          <strong>끼니</strong>
+        </div>
         <p>세대 사이 끼인 당신을 위한 맞춤형 재무설계</p>
       </div>
       <form className="auth-card" action={formAction}>
         <h1>{signup ? "끼니 시작하기" : "다시 만났어요"}</h1>
-        <p>{signup ? "내 정보와 진단 결과를 안전하게 이어서 볼 수 있어요." : "저장해 둔 우리 집 재무 흐름을 이어서 확인하세요."}</p>
+        <p>{signup ? "계정을 만든 뒤 약속과 목표를 확인하고 재무 정보를 입력해요." : "저장해 둔 우리 집 재무 흐름을 이어서 확인하세요."}</p>
         {signup ? (
           <div className="form-field">
             <label htmlFor="displayName">부를 이름</label>

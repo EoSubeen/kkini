@@ -53,7 +53,7 @@ export default async function CurrentDiagnosisPage() {
   return (
     <div className="page-stack diagnosis-page">
       <SegmentTabs items={diagnosisTabs} current="/diagnosis/current" />
-      <PageIntro title="지금 우리 집 재무 균형" description={`${result.depletionAge === null ? "95세까지 금융자산이 유지되고" : `금융자산은 ${result.depletionAge}세에 바닥나고`}, 95세엔 약 ${(result.assetsAt95 / 10000).toFixed(1)}억 원으로 예상되요.`} />
+      <PageIntro title="지금 우리 집 재무 균형" description={`${result.depletionAge === null ? "95세까지 금융자산이 유지되고" : `금융자산은 ${result.depletionAge}세에 바닥나고`}, 95세엔 약 ${(result.assetsAt95 / 10000).toFixed(1)}억 원으로 예상돼요.`} />
 
       <section className="diagnosis-overview" aria-labelledby="cashflow-heading">
         <div className="diagnosis-overview__copy">
@@ -71,14 +71,14 @@ export default async function CurrentDiagnosisPage() {
         <SectionHeading title="재무 건강 지표" action={<CalculationBasisDialog />} />
         <div className="health-ledger">
           <Metric label="비상자금" value={`${emergencyMonths.toFixed(1)}개월`} hint={emergencyMonths >= 6 ? "기본 안전망이 있어요" : "3~6개월을 준비해요"} status={emergencyMonths >= 6 ? "good" : "warn"} />
-          <Metric label="부채 / 소득" value={`${Math.round(debtRate)}%`} hint={debtRate <= 100 ? "관리 가능한 범위에요" : "조정이 필요해요"} status={debtRate <= 100 ? "good" : "warn"} />
-          <Metric label="집 중심 자산" value={`${Math.round(homeRate)}%`} hint={homeRate <= 60 ? "자산 구성이 분산됬어요" : "비중이 노파요"} status={homeRate <= 60 ? "good" : "warn"} />
+          <Metric label="부채 / 소득" value={`${Math.round(debtRate)}%`} hint={debtRate <= 100 ? "관리 가능한 범위예요" : "조정이 필요해요"} status={debtRate <= 100 ? "good" : "warn"} />
+          <Metric label="집 중심 자산" value={`${Math.round(homeRate)}%`} hint={homeRate <= 60 ? "자산 구성이 분산됐어요" : "비중이 높아요"} status={homeRate <= 60 ? "good" : "warn"} />
           <Metric label="연금 공백" value={`${pensionGap}년`} hint={pensionGap === 0 ? "공백이 없어요" : "보완이 필요해요"} status={pensionGap === 0 ? "good" : "risk"} />
         </div>
       </section>
 
       <section className="peer-section section-stack">
-        <SectionHeading title="나와 비스한 가구는 어떤가요?" description={peer.applicable ? peer.source : `${peer.source} (내 나이와 연령대가 달라 참고용이에요)`} />
+        <SectionHeading title="나와 비슷한 가구는 어떤가요?" description={peer.applicable ? peer.source : `${peer.source} (내 나이와 연령대가 달라 참고용이에요)`} />
         <div className="chart-panel peer-chart">
           <div className="peer-chart__legend" aria-hidden="true"><span><i />우리 집</span><span><b />50대 가구 평균</span></div>
           {peers.map((row) => (

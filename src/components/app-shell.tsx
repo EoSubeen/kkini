@@ -42,6 +42,7 @@ export function ProductShell({ children }: { children: ReactNode }) {
               className="bottom-nav__item"
               data-active={active}
               href={item.href}
+              prefetch
               key={item.href}
               aria-current={active ? "page" : undefined}
             >
@@ -74,7 +75,7 @@ export function AppHeader() {
         <ArrowLeft size={24} aria-hidden="true" />
       </button>
       <Link className="brand-lockup" href="/home" aria-label="끼니 홈">
-        <Image src="/kkini/logo-symbol.png" alt="" width={29} height={29} priority />
+        <Image src="/kkini/logo-symbol.png" alt="" width={29} height={27} priority />
         <strong>끼니</strong>
       </Link>
       <span className="header-spacer" aria-hidden="true" />

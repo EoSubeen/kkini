@@ -4,7 +4,7 @@ import { kimSandProfile } from "@/domain/finance";
 import { OnboardingForm } from "./onboarding-form";
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }),
 }));
 
 afterEach(() => {

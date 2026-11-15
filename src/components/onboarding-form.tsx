@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import type { FinancialProfile } from "@/lib/contracts";
 import { Card, PageIntro, ProgressBar, SectionHeading } from "./ui";
 
@@ -138,9 +138,11 @@ function initialValues(profile?: FinancialProfile | null) {
 export function OnboardingForm({
   defaultName = "",
   initialProfile = null,
+  setupMode = false,
 }: {
   defaultName?: string;
   initialProfile?: FinancialProfile | null;
+  setupMode?: boolean;
 }) {
   const saved = initialValues(initialProfile);
   const has = (key: string) => saved[key] !== undefined;
@@ -150,6 +152,8 @@ export function OnboardingForm({
   const [step, setStep] = useState(0);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => { router.prefetch("/diagnosis/current"); }, [router]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -241,7 +245,7 @@ export function OnboardingForm({
   return (
     <form className="page-stack" onSubmit={submit}>
       <PageIntro
-        eyebrow={`정보 입력 · ${step + 1} / ${steps.length}`}
+        eyebrow={`${setupMode ? "3 / 3 · 정보 입력" : "재무 정보 수정"} · ${step + 1} / ${steps.length}`}
         title={steps[step][0]}
         description={steps[step][1]}
       />

@@ -41,6 +41,15 @@ test.describe("authenticated persistence", () => {
     await page.getByLabel("이메일").fill(email);
     await page.getByLabel("비밀번호").fill(password);
     await page.getByRole("button", { name: "계정 만들기" }).click();
+    await expect(page).toHaveURL(/\/consultation\/consent$/);
+    for (const label of ["이 앱은 계산 도구예요", "상품을 팔지 않아요", "숫자는 추정이에요"]) {
+      await page.getByText(label, { exact: true }).click();
+      await expect(page.getByRole("checkbox", { name: new RegExp(label) })).toBeChecked();
+    }
+    await page.getByRole("button", { name: /모두 확인했어요/ }).click();
+    await expect(page).toHaveURL(/\/consultation\/goals$/);
+    await page.getByRole("button", { name: /내 노후/ }).click();
+    await page.getByRole("button", { name: /목표로 계속하기/ }).click();
     await expect(page).toHaveURL(/\/onboarding$/);
 
     await page.getByLabel(/내 나이/).fill("50");
