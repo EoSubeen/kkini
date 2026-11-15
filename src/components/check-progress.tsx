@@ -121,7 +121,7 @@ export function CheckProgress({ plannedAssets = [] }: { plannedAssets?: number[]
         <button className="button" type="button" onClick={compare}>계획과 비교하기</button>
         {review ? <p className="notice" role="status">{review}</p> : null}
       </Card>
-      <p className="service-footnote">정년·임금피크 변경, 부모님 요야 시작, 금리 1%p 이상 변화가 생기면 1년을 기다리지 말고 다시 설계해요.</p>
+      <p className="service-footnote">정년·임금피크 변경, 부모님 요양 시작, 금리 1%p 이상 변화가 생기면 1년을 기다리지 말고 다시 설계해요.</p>
     </div>
   );
 }

@@ -80,6 +80,7 @@ export const avail = planning.avail as unknown as Fn<[R6Input, R6Ctx, Set<string
 export const findBest = planning.findBest as unknown as Fn<[R6Input, R6Ctx, { keepHouse?: boolean }?], { ids: string[]; result: R6Result; wasNeg: boolean; alreadyOk: boolean }>;
 export const sensitivity = planning.sensitivity as unknown as Fn<[Record<string, unknown>], { base: number; rows: SensitivityRow[] }>;
 export const runReportCase = planning.runReportCase as unknown as Fn<[], R6Result>;
+export const REPORT_CASE = planning.REPORT_CASE as unknown as Record<string, unknown>;
 export const parHp = planning.parHp as unknown as Fn<[R6Input, boolean], number>;
 export const hpMonthly = planning.hpMonthly as unknown as Fn<[number, number], number>;
 export const dsInfo = planning.dsInfo as unknown as Fn<[R6Input, { ratio: number; age: number }], { H: number; N: number; age: number; cost: number; cash: number; bal: number; high: boolean }>;

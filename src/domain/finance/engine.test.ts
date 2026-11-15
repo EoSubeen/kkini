@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { REPORT_RECOMMENDATION_CASE } from "./assumptions";
-import { reportCaseResult, monteCarlo } from "./analysis";
+import { reportCaseResult, reportCaseMonteCarlo, monteCarlo } from "./analysis";
 import { calculateFinance } from "./engine";
 import { kimSandProfile } from "./fixtures";
 import { loanBalance, payment } from "./math";
@@ -121,5 +121,13 @@ describe("calculateFinance", () => {
     expect(result.notices).toContain(
       "이사 후 주택연금은 새 집 기준으로 월액을 다시 확인해 주세요.",
     );
+  });
+});
+
+describe("report case Monte Carlo (shock page reference card)", () => {
+  it("shows the report table 17 success rates for the fixed report case", () => {
+    const mc = reportCaseMonteCarlo();
+    expect(mc.selected.p).toBeCloseTo(0.992, 3);
+    expect(mc.guardrail.p).toBe(1);
   });
 });
