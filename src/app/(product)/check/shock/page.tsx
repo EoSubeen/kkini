@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { Card, checkTabs, Metric, PageIntro, SectionHeading, SegmentTabs } from "@/components/ui";
-import { assumptionSensitivity, monteCarlo, shockTests } from "@/domain/finance";
+import { assumptionSensitivity, monteCarlo, reportCaseMonteCarlo, shockTests } from "@/domain/finance";
 import { eokText } from "@/lib/format/money";
 import { getLatestState } from "@/server";
 
@@ -27,6 +27,7 @@ export default async function ShockPage() {
   const sel = selection ?? undefined;
   const shocks = shockTests(profile, sel);
   const mc = monteCarlo(profile, sel);
+  const reportMc = reportCaseMonteCarlo();
   const sens = assumptionSensitivity(profile, sel);
   const top = sens.rows.slice(0, 5);
 
@@ -44,6 +45,15 @@ export default async function ShockPage() {
           <Metric label="가드레일 발동" value={sel ? pct(mc.guardrail.cut) : "-"} hint="한 번 이상 생활비를 줄인 비율" />
         </div>
         <p className="notice">예금은 평균 3.0%·표준편차 0.8%p, 주식은 평균 6%·표준편차 18%p(폭락이 잦은 t분포), 물가는 평균 2%·표준편차 1%p예요. 실제 확률이 아니라 가정한 모형의 성공 비율이에요.</p>
+      </Card>
+
+      <Card tone="warm" className="report-card">
+        <div className="report-card__tag">제출 보고서의 고정 사례</div>
+        <div><strong style={{ fontSize: 19 }}>김샌드 씨 · 보고서 추천안</strong><p style={{ margin: "4px 0 0", color: "var(--kkini-muted)", fontSize: 14 }}>보고서 추천 조합(처방 8개)에 같은 모의실험을 돌린 비교용 값이에요. 내 입력값과 레시피 선택은 바뀌지 않아요.</p></div>
+        <div className="report-card__metrics">
+          <div className="report-card__metric"><span>95세까지 버틴 비율</span><strong>{pct(reportMc.selected.p)}</strong></div>
+          <div className="report-card__metric"><span>+ 인출 가드레일</span><strong>{pct(reportMc.guardrail.p)}</strong></div>
+        </div>
       </Card>
 
       <section className="section-stack">

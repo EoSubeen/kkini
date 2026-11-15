@@ -10,6 +10,7 @@ import {
   parHp,
   run,
   runReportCase,
+  REPORT_CASE,
   sensitivity,
   type R6Result,
 } from "./r6";
@@ -159,4 +160,9 @@ export function recommendRecipes(profile: FinancialProfile, keepHouse = false) {
 export function reportCaseResult() {
   const result = runReportCase();
   return { monthlyCashFlow: result.m0, depletionAge: result.deplete, assetsAt95: result.z95 };
+}
+
+/** 제출 보고서 추천안(고정 사례)의 몬테카를로 500회. 사용자 입력·선택과 무관한 비교용 값([표 17]). */
+export function reportCaseMonteCarlo(runs = 500) {
+  return { runs, selected: monte(REPORT_CASE, runs), guardrail: monte(REPORT_CASE, runs, true) };
 }
