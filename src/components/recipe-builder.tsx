@@ -60,6 +60,16 @@ export const categories: Category[] = [
   ]},
 ];
 
+function ingredientLayerClass(item: Ingredient, top = false) {
+  const category = categories.find((group) => group.ingredients.some((ingredient) => ingredient.id === item.id));
+  return [
+    "builder-layer",
+    category ? `builder-layer--${category.id}` : "",
+    `builder-layer--${item.id}`,
+    top ? "builder-layer--top" : "",
+  ].filter(Boolean).join(" ");
+}
+
 type Selection = Record<string, string[]>;
 type Preview = { monthlyCashFlow: number; depletionAge: number | null; assetsAt95: number; appliedRecipeIds?: string[]; notices?: string[] };
 
@@ -294,11 +304,11 @@ export function RecipeBuilder({
           </span>
           <div className="builder-layers">
             {selectedIngredients.map((item, index) => (
-              <span className="builder-layer" style={{ "--layer-bottom": `${index * 11}px` } as React.CSSProperties} key={`complete-${item.id}`}>
+              <span className={ingredientLayerClass(item)} style={{ "--layer-bottom": `${index * 11}px` } as React.CSSProperties} key={`complete-${item.id}`}>
                 <Image src={item.image} alt={item.name} fill sizes="(max-width: 540px) 92vw, 420px" loading="eager" />
               </span>
             ))}
-            <span className="builder-layer builder-layer--top" style={{ "--layer-bottom": `${Math.max(0, selectedIngredients.length * 8 - 12)}px` } as React.CSSProperties}>
+            <span className={ingredientLayerClass(selectedBread ?? categories[0].ingredients[3], true)} style={{ "--layer-bottom": `${Math.max(0, selectedIngredients.length * 8 - 12)}px` } as React.CSSProperties}>
               <Image src={topBreadImage} alt="샌드위치를 덮은 윗빵" fill sizes="(max-width: 540px) 92vw, 420px" loading="eager" />
             </span>
           </div>
@@ -368,7 +378,7 @@ export function RecipeBuilder({
         <div className="builder-layers">
           {selectedIngredients.map((item, index) => (
             <span
-              className="builder-layer"
+              className={ingredientLayerClass(item)}
               style={{ "--layer-bottom": `${index * 11}px` } as React.CSSProperties}
               key={`${item.id}-${index}`}
             >

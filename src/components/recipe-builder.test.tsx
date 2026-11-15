@@ -70,7 +70,10 @@ describe("RecipeBuilder", () => {
     fireEvent.click(screen.getByRole("button", { name: "샌드위치 완성하기" }));
 
     expect(await screen.findByRole("heading", { name: "김샌드 님의 실행 샌드위치" })).toBeVisible();
-    expect(screen.getByAltText("샌드위치를 덮은 윗빵")).toBeVisible();
+    const topBread = screen.getByAltText("샌드위치를 덮은 윗빵");
+    expect(topBread).toBeVisible();
+    expect(topBread.parentElement).toHaveClass("builder-layer--bread", "builder-layer--baguette", "builder-layer--top");
+    expect(screen.getByAltText("바게트").parentElement).toHaveClass("builder-layer--bread", "builder-layer--baguette");
     expect(screen.getByRole("button", { name: "실행 계획 보기" })).toBeVisible();
   });
 });
