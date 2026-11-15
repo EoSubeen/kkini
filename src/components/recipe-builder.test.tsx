@@ -86,4 +86,15 @@ describe("RecipeBuilder", () => {
       "builder-layer--milk",
     );
   });
+
+  it("uses the layered rectangular brie asset", () => {
+    render(<RecipeBuilder />);
+    fireEvent.click(screen.getByRole("tab", { name: "치즈" }));
+    fireEvent.click(screen.getByRole("button", { name: /브리/ }));
+
+    expect(screen.getByAltText("브리")).toHaveAttribute(
+      "src",
+      expect.stringContaining("brie-v2.png"),
+    );
+  });
 });

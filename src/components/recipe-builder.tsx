@@ -42,7 +42,7 @@ export const categories: Category[] = [
     { id: "ricotta", name: "리코타", meaning: "임의가입·임의계속가입", image: "/kkini/ingredients/cheese/ricotta.png", recipes: ["spouse", "npcont"] },
     { id: "cream", name: "크림치즈", meaning: "은퇴 후 생활비 조정", image: "/kkini/ingredients/cheese/cream-cheese.png", recipes: ["retm"] },
     { id: "gouda", name: "고다", meaning: "정년 뒤 5년 재취업", image: "/kkini/ingredients/cheese/gouda.png", recipes: ["reemp"] },
-    { id: "brie", name: "브리", meaning: "본인 주택연금", image: "/kkini/ingredients/cheese/brie.png", recipes: ["hp"] },
+    { id: "brie", name: "브리", meaning: "본인 주택연금", image: "/kkini/ingredients/cheese/brie-v2.png", recipes: ["hp"] },
   ]},
   { id: "vegetable", label: "채소", title: "가족 안전망과 균형", description: "위험을 막거나 가족 상황을 보완하는 요소예요. 1~2종을 함께 넣을 수 있어요.", max: 2, ingredients: [
     { id: "lettuce", name: "양상추", meaning: "비상자금 6개월치", image: "/kkini/ingredients/vegetable/lettuce.png", recipes: [] },
