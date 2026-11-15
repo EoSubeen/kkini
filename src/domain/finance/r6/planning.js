@@ -121,7 +121,8 @@ export const RECIPES = [
   { id: "sil5", t: "5세대 실손으로 전환", manual: true, x: "ins", p: (o, c) => { const s = silInfo(c); return { ins_m: Math.max(0, o.ins_m - s.m * s.cut) }; }, ok: (o, c) => silInfo(c).ok },
   { id: "ins", t: "보험 리모델링", manual: true, x: "sil5", p: (o) => ({ ins_m: o.ins_m * 2 / 3 }), ok: (o) => o.ins_m > 0 },
   { id: "par", t: "부모 지원 조정", manual: true, x: "parhp", p: (o) => ({ par_m: Math.max(0, o.par_m - o.par_new_m) }), ok: (o) => o.par_m > 0 && o.par_new_m > 0 },
-  { id: "term", t: "정기보험으로 사망보장 채우기", manual: true, p: (o) => { const nd = needs(o), gap = nd.gap, end = o.age0 + Math.max(1, nd.yk); return { term_cover: gap, term_m: termPrem(o.age0, gap), term_end: end }; }, ok: (o) => needs(o).gap > 0 },
+  // r6 원본처럼 필요보장액은 처방 적용 전 '지금 그대로'의 입력(ctx.base)으로 계산한다(보고서 [표 8] 부족액 2.0억·보험료 월 12만 원).
+  { id: "term", t: "정기보험으로 사망보장 채우기", manual: true, p: (o, c) => { const b = c.base || o, nd = needs(b), gap = nd.gap, end = b.age0 + Math.max(1, nd.yk); return { term_cover: gap, term_m: termPrem(b.age0, gap), term_end: end }; }, ok: (o) => needs(o).gap > 0 },
   { id: "irp", t: "IRP 한도 채우기", p: () => ({ irp_y: 600 }) },
   { id: "spouse", t: "배우자 국민연금 임의가입", manual: true, p: (o) => ({ sp_prem: 9.623, sp_years: Math.max(0, 60 - o.sage0), snp_m: o.snp_m + Math.max(0, 60 - o.sage0) * 1.8 }), ok: (o) => o.sage0 > 0 && o.sage0 < 60 && o.sp_net_m === 0 },
   { id: "reemp", t: "정년 뒤 5년 재취업", p: () => ({ reemp_m: 200 }) },
@@ -153,6 +154,7 @@ export function avail(base, ctx, sel) { return RECIPES.filter((rc) => !rc.ok || 
 /** r6 cfg(): 기본 입력에 고른 처방과 사건을 덮어쓰고 투자 배분을 연결한다. */
 export function cfg(base, ctx, selIds = [], evIds = []) {
   const sel = new Set(selIds);
+  ctx = Object.assign({}, ctx, { base });
   const valid = new Set(avail(base, ctx, sel).map((r) => r.id));
   for (const id of [...sel]) if (!valid.has(id)) sel.delete(id);
   const o = Object.assign({}, base);
